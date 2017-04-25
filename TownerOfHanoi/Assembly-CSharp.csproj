@@ -67,6 +67,7 @@
      <Compile Include="Assets\DestPrimitives\Source\Primitives\WireBox.cs" />
      <Compile Include="Assets\Scripts\Gravity.cs" />
      <Compile Include="Assets\Scripts\MenuControls.cs" />
+     <Compile Include="Assets\Scripts\virBtnScript.cs" />
      <Compile Include="Assets\Vuforia\Scripts\BackgroundPlaneBehaviour.cs" />
      <Compile Include="Assets\Vuforia\Scripts\CloudRecoBehaviour.cs" />
      <Compile Include="Assets\Vuforia\Scripts\CylinderTargetBehaviour.cs" />
