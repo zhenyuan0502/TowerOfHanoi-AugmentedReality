@@ -2,8 +2,8 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Gravity.cs">
     <Files>
-      <File FileName="Assets/Scripts/Gravity.cs" Line="21" Column="2" />
-      <File FileName="Assets/Scripts/MenuControls.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Gravity.cs" Line="19" Column="22" />
+      <File FileName="Assets/Scripts/virBtnScript.cs" Line="20" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

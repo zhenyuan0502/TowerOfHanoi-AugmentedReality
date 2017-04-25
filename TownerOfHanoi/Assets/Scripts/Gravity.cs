@@ -1,12 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Vuforia;
 
 public class Gravity : MonoBehaviour {
 	// Use this for initialization
-	float defaultZ = 0;
-	float defaultX = 0;
-	float defaultY = 0;
+	public float defaultZ = 0;
+	public float defaultX = 0;
+	public float defaultY = 0;
 	BoxCollider box;
 
 	void Start () {
@@ -23,9 +24,9 @@ public class Gravity : MonoBehaviour {
 		if (transform.position.y < 0) {
 			transform.position = new Vector3 (defaultX, defaultY, defaultZ);
 		} else {
-			transform.position = new Vector3 (defaultX, transform.position.y, defaultZ);
-		}			
-
-
+			transform.position = new Vector3 (transform.position.x, transform.position.y, defaultZ);
+		}
 	}
+
+
 }
