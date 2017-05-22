@@ -21,11 +21,15 @@ public class Gravity : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if (transform.position.y < 0) {
-			transform.position = new Vector3 (defaultX, defaultY, defaultZ);
-		} else {
-			transform.position = new Vector3 (transform.position.x, transform.position.y, defaultZ);
-		}
+//		if (transform.position.y < 0) {
+//			transform.position = new Vector3 (defaultX, defaultY, defaultZ);
+//		} else {
+//			transform.position = new Vector3 (transform.position.x, transform.position.y, defaultZ);
+//			defaultX = transform.position.x;
+//			defaultY = transform.position.y;
+//			defaultZ = transform.position.z;
+//		}
+		transform.position = new Vector3 (defaultX, defaultY, defaultZ);
 	}
 
 
