@@ -1,9 +1,8 @@
 ﻿<Properties StartupItem="Assembly-CSharp.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Gravity.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/virBtnScript.cs">
     <Files>
-      <File FileName="Assets/Scripts/virBtnScript.cs" Line="52" Column="35" />
-      <File FileName="Assets/Scripts/Gravity.cs" Line="18" Column="18" />
+      <File FileName="Assets/Scripts/virBtnScript.cs" Line="223" Column="21" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
