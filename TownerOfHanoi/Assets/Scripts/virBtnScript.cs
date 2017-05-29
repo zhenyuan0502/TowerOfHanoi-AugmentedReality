@@ -36,7 +36,6 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler {
 		// Khởi tạo vị trí tọa độ Y của torus, tọa độ Y này sẽ không thay đổi
 		positionY_of_level = new float[9];
 
-
 		// Lưu ý: POP luôn là trên cùng
 		// Khởi tạo stack Tower A
 		stkTowerA = new Stack<GameObject>();
@@ -162,6 +161,7 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler {
 					stkTowerC.Push (temp_2);
 					break;
 				}
+				hold = false;
 			} else {
 				flag = 3;
 				hold = true;
@@ -182,7 +182,6 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler {
 			Debug.Log ("On C Release");
 			break;
 		}
-
 	}
 
 	// Update is called once per frame
