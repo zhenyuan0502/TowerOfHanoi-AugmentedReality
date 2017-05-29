@@ -6,10 +6,17 @@ using UnityEngine.UI;
 
 public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 {
+	// Sử dụng để gọi nhanh button ẩn - hiện (close - release)
+	private static int BUTTON_A = 1;
+	private static int BUTTON_B = 2;
+	private static int BUTTON_C = 3;
+
 	private GameObject btn_towerA;
 	private GameObject btn_towerB;
 	private GameObject btn_towerC;
 	private GameObject btn_release;
+
+	private TextMesh txt_message;
 
 	private GameObject TowerA;
 	private GameObject TowerB;
@@ -76,6 +83,8 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 		btn_towerB = GameObject.Find ("btn_towerB");
 		btn_towerC = GameObject.Find ("btn_towerC");
 		btn_release = GameObject.Find ("btn_release");
+		txt_message = GameObject.Find ("message").GetComponent<TextMesh> ();
+
 
 		// Lấy Tower
 		TowerC = GameObject.Find ("TowerC");
@@ -105,18 +114,10 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 				Debug.Log ("On A Press");
 				switch (flag) {
 				case 2:
-					if (stkTowerB.Count != 0) {
-						GameObject temp_1 = stkTowerB.Peek ();
-						stkTowerB.Pop ();
-						stkTowerA.Push (temp_1);
-					}
+					MoveTorus (stkTowerB, stkTowerA);
 					break;
 				case 3:
-					if (stkTowerC.Count != 0) {
-						GameObject temp_2 = stkTowerC.Peek ();
-						stkTowerC.Pop ();
-						stkTowerA.Push (temp_2);
-					}
+					MoveTorus (stkTowerC, stkTowerA);
 					break;
 				}
 				hold = false;
@@ -124,9 +125,7 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 			} else {
 				flag = 1;
 				hold = true;
-				btn_towerA.SetActive (false);
-				btn_towerB.SetActive (true);
-				btn_towerC.SetActive (true);
+				OneButtonClose (BUTTON_A);
 			}
 			break;
 		case "btn_towerB": 
@@ -134,18 +133,10 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 			if (hold) {
 				switch (flag) {
 				case 1:
-					if (stkTowerA.Count != 0) {
-						GameObject temp_1 = stkTowerA.Peek ();
-						stkTowerA.Pop ();
-						stkTowerB.Push (temp_1);
-					}
+					MoveTorus (stkTowerA, stkTowerB);
 					break;
 				case 3:
-					if (stkTowerC.Count != 0) {
-						GameObject temp_2 = stkTowerC.Peek ();
-						stkTowerC.Pop ();
-						stkTowerB.Push (temp_2);
-					}
+					MoveTorus (stkTowerC, stkTowerB);
 					break;
 				}
 				hold = false;
@@ -154,29 +145,18 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 			} else {
 				flag = 2;
 				hold = true;
-				btn_towerB.SetActive (false);
-				btn_towerA.SetActive (true);
-				btn_towerC.SetActive (true);
+				OneButtonClose (BUTTON_B);
 			}
 			break;
 		case "btn_towerC": 
 			Debug.Log ("On C Press");
-
 			if (hold) {
 				switch (flag) {
 				case 1:
-					if (stkTowerA.Count != 0) {
-						GameObject temp_1 = stkTowerA.Peek ();
-						stkTowerA.Pop ();
-						stkTowerC.Push (temp_1);
-					}
+					MoveTorus (stkTowerA, stkTowerC);
 					break;
 				case 2:
-					if (stkTowerB.Count != 0) {
-						GameObject temp_2 = stkTowerB.Peek ();
-						stkTowerB.Pop ();
-						stkTowerC.Push (temp_2);
-					}
+					MoveTorus (stkTowerB, stkTowerC);
 					break;
 				}
 				hold = false;
@@ -185,16 +165,12 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 			} else {
 				flag = 3;
 				hold = true;
-				btn_towerC.SetActive (false);
-				btn_towerA.SetActive (true);
-				btn_towerB.SetActive (true);
+				OneButtonClose (BUTTON_C);
 			}
 			break;
 		case "btn_release":
 			Debug.Log ("On ReleaseButton Press");
-			btn_towerA.SetActive (true);
-			btn_towerB.SetActive (true);
-			btn_towerC.SetActive (true);
+			AllButtonRelease ();
 			hold = false;
 			break;
 		}
@@ -221,50 +197,9 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 	// Update is called once per frame
 	void Update ()
 	{
-//		if (flag == 1) {
-//			
-////			torus [1].transform.position = new Vector3 (pTowerA, positionY_of_level [1], defaultZ);
-////			torus [2].transform.position = new Vector3 (pTowerA, positionY_of_level [2], defaultZ);
-////			torus [3].transform.position = new Vector3 (pTowerA, positionY_of_level [3], defaultZ);
-////			torus [4].transform.position = new Vector3 (pTowerA, positionY_of_level [4], defaultZ);
-////			torus [5].transform.position = new Vector3 (pTowerA, positionY_of_level [5], defaultZ);
-////			torus [6].transform.position = new Vector3 (pTowerA, positionY_of_level [6], defaultZ);
-////			torus [7].transform.position = new Vector3 (pTowerA, positionY_of_level [7], defaultZ);
-////			torus [8].transform.position = new Vector3 (pTowerA, positionY_of_level [8], defaultZ);
-//		} else if (flag == 2) {
-//			
-////			torus [1].transform.position = new Vector3 (pTowerB, positionY_of_level [1], defaultZ);
-////			torus [2].transform.position = new Vector3 (pTowerB, positionY_of_level [2], defaultZ);
-////			torus [3].transform.position = new Vector3 (pTowerB, positionY_of_level [3], defaultZ);
-////			torus [4].transform.position = new Vector3 (pTowerB, positionY_of_level [4], defaultZ);
-////			torus [5].transform.position = new Vector3 (pTowerB, positionY_of_level [5], defaultZ);
-////			torus [6].transform.position = new Vector3 (pTowerB, positionY_of_level [6], defaultZ);
-////			torus [7].transform.position = new Vector3 (pTowerB, positionY_of_level [7], defaultZ);
-////			torus [8].transform.position = new Vector3 (pTowerB, positionY_of_level [8], defaultZ);
-//		} else if (flag == 3) {
-//			
-////			torus [1].transform.position = new Vector3 (pTowerC, positionY_of_level [1], defaultZ);
-////			torus [2].transform.position = new Vector3 (pTowerC, positionY_of_level [2], defaultZ);
-////			torus [3].transform.position = new Vector3 (pTowerC, positionY_of_level [3], defaultZ);
-////			torus [4].transform.position = new Vector3 (pTowerC, positionY_of_level [4], defaultZ);
-////			torus [5].transform.position = new Vector3 (pTowerC, positionY_of_level [5], defaultZ);
-////			torus [6].transform.position = new Vector3 (pTowerC, positionY_of_level [6], defaultZ);
-////			torus [7].transform.position = new Vector3 (pTowerC, positionY_of_level [7], defaultZ);
-////			torus [8].transform.position = new Vector3 (pTowerC, positionY_of_level [8], defaultZ);
-//		}
-
-//		int countA = stkTowerA.Count;
-//		int element = 1;
-//		// item lấy từ 1 -> hết stack
-//		foreach(var item in stkTowerA){
-//			item.transform.position = new Vector3 (pTowerA, positionY_of_level[8 - countA + element], defaultZ);
-//			element++;
-//		}
-
 		print (stkTowerA, pTowerA, defaultZ, positionY_of_level);
 		print (stkTowerB, pTowerB, defaultZ, positionY_of_level);
 		print (stkTowerC, pTowerC, defaultZ, positionY_of_level);
-
 	}
 
 	public static void print (Stack<GameObject> stkTower, float pTower, float defaultZ, float[] positionY_of_level)
@@ -282,5 +217,34 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 		btn_towerA.SetActive (true);
 		btn_towerB.SetActive (true);
 		btn_towerC.SetActive (true);
+	}
+
+	public void OneButtonClose(int button){
+		btn_towerA.SetActive (!(button == BUTTON_A));
+		btn_towerB.SetActive (!(button == BUTTON_B));
+		btn_towerC.SetActive (!(button == BUTTON_C));
+	}
+
+	public void MoveTorus(Stack<GameObject> stk_from, Stack<GameObject> stk_to){
+		if (stk_from.Count != 0) {
+			GameObject temp_1 = stk_from.Peek ();
+			if (stk_to.Count == 0) {
+				stk_from.Pop ();
+				stk_to.Push (temp_1);
+				txt_message.text = "Good !!";
+			} else {
+				GameObject temp_2 = stk_to.Peek ();
+				if (int.Parse (temp_1.name.Substring (7, 1)) < int.Parse (temp_2.name.Substring (7, 1))) {
+					stk_from.Pop ();
+					stk_to.Push (temp_1);
+					txt_message.text = "Excellent !!";
+				} else {
+					txt_message.text = "Invalid !!";
+				}
+			}
+
+		} else {
+			txt_message.text = "Can't move !!";
+		}
 	}
 }
