@@ -14,7 +14,6 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 	private GameObject btn_towerA;
 	private GameObject btn_towerB;
 	private GameObject btn_towerC;
-	private GameObject btn_release;
 
 	private TextMesh txt_message;
 
@@ -82,7 +81,6 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 		btn_towerA = GameObject.Find ("btn_towerA");
 		btn_towerB = GameObject.Find ("btn_towerB");
 		btn_towerC = GameObject.Find ("btn_towerC");
-		btn_release = GameObject.Find ("btn_release");
 		txt_message = GameObject.Find ("message").GetComponent<TextMesh> ();
 
 
@@ -102,7 +100,6 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 		btn_towerA.GetComponent<VirtualButtonBehaviour> ().RegisterEventHandler (this);
 		btn_towerB.GetComponent<VirtualButtonBehaviour> ().RegisterEventHandler (this);
 		btn_towerC.GetComponent<VirtualButtonBehaviour> ().RegisterEventHandler (this);
-		btn_release.GetComponent<VirtualButtonBehaviour> ().RegisterEventHandler (this);
 	}
 
 	// Khi button được nhấn, chỉ thay đổi X và Y, không thay đổi Z
@@ -168,11 +165,6 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 				OneButtonClose (BUTTON_C);
 			}
 			break;
-		case "btn_release":
-			Debug.Log ("On ReleaseButton Press");
-			AllButtonRelease ();
-			hold = false;
-			break;
 		}
 	}
 
@@ -187,9 +179,6 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 			break;
 		case "btn_towerC": 
 			Debug.Log ("On C Release");
-			break;
-		case "btn_release":
-			Debug.Log ("On ReleaseButton Release");
 			break;
 		}
 	}
