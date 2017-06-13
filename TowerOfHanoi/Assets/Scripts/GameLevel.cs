@@ -4,6 +4,6 @@ using UnityEngine;
 
 public class GameLevel : MonoBehaviour {
 
-	public static int currentLevel = 1;
+	public static int currentLevel = 7;
 
 }

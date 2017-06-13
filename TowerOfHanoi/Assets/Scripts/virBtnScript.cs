@@ -78,13 +78,16 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 			torus [i] = GameObject.Find ("Torus (" + i + ")");
 
 			if (i >= 8 - AmoutOfDisk + j) {
-				positionY_of_level [j] = torus [i].transform.position.y;
-				j++;
+				if (torus [i] != null) {
+					positionY_of_level [j] = torus [i].transform.position.y;
+					++j;
+				}
 			}
+		}
 
-			if (i > AmoutOfDisk) {
-				torus [i].SetActive (false);
-			}
+
+		for (int i = AmoutOfDisk + 1; i <= 8; i++) {
+			torus [i].SetActive (false);
 		}
 
 //		default								8 torus								3 torus
@@ -118,6 +121,8 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 
 
 		txt_message.text = "Amout of Disk: " + AmoutOfDisk;
+
+
 	}
 
 	// Khi button được nhấn, chỉ thay đổi X và Y, không thay đổi Z
