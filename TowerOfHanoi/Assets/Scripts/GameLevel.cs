@@ -4,15 +4,6 @@ using UnityEngine;
 
 public class GameLevel : MonoBehaviour {
 
-	static public int currentLevel = 0;
+	public static int currentLevel = 1;
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
 }

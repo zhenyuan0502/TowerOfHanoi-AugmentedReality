@@ -2132,6 +2132,7 @@ GameObject:
   - component: {fileID: 1743844456}
   - component: {fileID: 1743844458}
   - component: {fileID: 1743844457}
+  - component: {fileID: 1743844459}
   m_Layer: 0
   m_Name: message
   m_TagString: Untagged
@@ -2208,6 +2209,17 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+--- !u!114 &1743844459
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1743844455}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17b2a0202101942bb9ec469fdc1cd9a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &1811867049 stripped
 Transform:
   m_PrefabParentObject: {fileID: 400000, guid: 2a725225d3d981b4182014a2e20b501c, type: 2}

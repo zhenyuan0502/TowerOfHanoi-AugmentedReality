@@ -40,6 +40,9 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 	bool hold = false;
 
 	int flag = 1;
+
+	int AmoutOfDisk = 0;
+
 	// Use this for initialization
 	void Start ()
 	{
@@ -100,6 +103,10 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 		btn_towerA.GetComponent<VirtualButtonBehaviour> ().RegisterEventHandler (this);
 		btn_towerB.GetComponent<VirtualButtonBehaviour> ().RegisterEventHandler (this);
 		btn_towerC.GetComponent<VirtualButtonBehaviour> ().RegisterEventHandler (this);
+
+		// Sai nhục quá
+		AmoutOfDisk = GameLevel.currentLevel;
+		txt_message.text = "Amout of Disk: " + AmoutOfDisk;
 	}
 
 	// Khi button được nhấn, chỉ thay đổi X và Y, không thay đổi Z
@@ -185,7 +192,8 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 
 	// Update is called once per frame
 	void Update ()
-	{
+	{	
+		
 		print (stkTowerA, pTowerA, defaultZ, positionY_of_level);
 		print (stkTowerB, pTowerB, defaultZ, positionY_of_level);
 		print (stkTowerC, pTowerC, defaultZ, positionY_of_level);
