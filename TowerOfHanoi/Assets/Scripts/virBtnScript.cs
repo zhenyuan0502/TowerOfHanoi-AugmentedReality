@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Vuforia;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 {
@@ -14,6 +15,7 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 	private GameObject btn_towerA;
 	private GameObject btn_towerB;
 	private GameObject btn_towerC;
+	private GameObject btn_reset;
 
 	private TextMesh txt_message;
 
@@ -37,6 +39,7 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 	public float defaultX = 0;
 	public float defaultY = 0;
 
+	bool isWin = false;
 	bool hold = false;
 
 	int flag = 1;
@@ -109,8 +112,12 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 		btn_towerA = GameObject.Find ("btn_towerA");
 		btn_towerB = GameObject.Find ("btn_towerB");
 		btn_towerC = GameObject.Find ("btn_towerC");
+		btn_reset = GameObject.Find ("btn_reset");
+
 		txt_message = GameObject.Find ("message").GetComponent<TextMesh> ();
 
+		// Ẩn btn reset
+		btn_reset.SetActive(false);
 
 		// Lấy Z mặc định (của cột)
 		defaultZ = TowerA.transform.position.z;
@@ -118,6 +125,8 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 		btn_towerA.GetComponent<VirtualButtonBehaviour> ().RegisterEventHandler (this);
 		btn_towerB.GetComponent<VirtualButtonBehaviour> ().RegisterEventHandler (this);
 		btn_towerC.GetComponent<VirtualButtonBehaviour> ().RegisterEventHandler (this);
+
+		btn_reset.GetComponent<VirtualButtonBehaviour> ().RegisterEventHandler (this);
 
 
 		txt_message.text = "Amout of Disk: " + AmoutOfDisk;
@@ -130,62 +139,79 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 	{
 		switch (vButton.VirtualButtonName) {
 		case "btn_towerA":
-			if (hold) {
+			if (!isWin) {
 				Debug.Log ("On A Press");
-				switch (flag) {
-				case 2:
-					MoveTorus (stkTowerB, stkTowerA);
-					break;
-				case 3:
-					MoveTorus (stkTowerC, stkTowerA);
-					break;
+
+				if (hold) {
+					Debug.Log ("On A Press");
+					switch (flag) {
+					case 2:
+						MoveTorus (stkTowerB, stkTowerA);
+						break;
+					case 3:
+						MoveTorus (stkTowerC, stkTowerA);
+						break;
+					}
+					hold = false;
+					AllButtonReleaseExceptReset ();
+				} else {
+					flag = 1;
+					hold = true;
+					OneButtonClose (BUTTON_A);
 				}
-				hold = false;
-				AllButtonRelease ();
-			} else {
-				flag = 1;
-				hold = true;
-				OneButtonClose (BUTTON_A);
 			}
+
 			break;
 		case "btn_towerB": 
-			Debug.Log ("On B Press");
-			if (hold) {
-				switch (flag) {
-				case 1:
-					MoveTorus (stkTowerA, stkTowerB);
-					break;
-				case 3:
-					MoveTorus (stkTowerC, stkTowerB);
-					break;
-				}
-				hold = false;
-				AllButtonRelease ();
+			if (!isWin) {
+				Debug.Log ("On B Press");
+				if (hold) {
+					switch (flag) {
+					case 1:
+						MoveTorus (stkTowerA, stkTowerB);
+						break;
+					case 3:
+						MoveTorus (stkTowerC, stkTowerB);
+						break;
+					}
+					hold = false;
+					AllButtonReleaseExceptReset ();
 
-			} else {
-				flag = 2;
-				hold = true;
-				OneButtonClose (BUTTON_B);
+				} else {
+					flag = 2;
+					hold = true;
+					OneButtonClose (BUTTON_B);
+				}
 			}
 			break;
 		case "btn_towerC": 
-			Debug.Log ("On C Press");
-			if (hold) {
-				switch (flag) {
-				case 1:
-					MoveTorus (stkTowerA, stkTowerC);
-					break;
-				case 2:
-					MoveTorus (stkTowerB, stkTowerC);
-					break;
-				}
-				hold = false;
-				AllButtonRelease ();
+			if (!isWin) {
+				Debug.Log ("On C Press");
+				if (hold) {
+					switch (flag) {
+					case 1:
+						MoveTorus (stkTowerA, stkTowerC);
+						break;
+					case 2:
+						MoveTorus (stkTowerB, stkTowerC);
+						break;
+					}
+					hold = false;
+					AllButtonReleaseExceptReset ();
 
-			} else {
-				flag = 3;
-				hold = true;
-				OneButtonClose (BUTTON_C);
+				} else {
+					flag = 3;
+					hold = true;
+					OneButtonClose (BUTTON_C);
+				}
+			}
+
+			break;
+
+		case "btn_reset":
+			if (isWin) {
+				Debug.Log ("On Reset Press");
+				SceneManager.LoadScene ("Menu 3D");
 			}
 			break;
 		}
@@ -208,10 +234,15 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 
 	// Update is called once per frame
 	void Update ()
-	{	
-		print (stkTowerA, pTowerA, defaultZ, positionY_of_level, AmoutOfDisk);
-		print (stkTowerB, pTowerB, defaultZ, positionY_of_level, AmoutOfDisk);
-		print (stkTowerC, pTowerC, defaultZ, positionY_of_level, AmoutOfDisk);
+	{	if (stkTowerC.Count == AmoutOfDisk) {
+			txt_message.text = "You Win !!!\nClick to comeback";
+			isWin = true;
+			AllButtonLockExceptReset ();
+		} 
+			print (stkTowerA, pTowerA, defaultZ, positionY_of_level, AmoutOfDisk);
+			print (stkTowerB, pTowerB, defaultZ, positionY_of_level, AmoutOfDisk);
+			print (stkTowerC, pTowerC, defaultZ, positionY_of_level, AmoutOfDisk);
+
 	}
 
 	public static void print (Stack<GameObject> stkTower, float pTower, float defaultZ, float[] positionY_of_level, int AmoutOfDisk)
@@ -225,10 +256,18 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 		}
 	}
 
-	public void AllButtonRelease(){
+	public void AllButtonReleaseExceptReset(){
 		btn_towerA.SetActive (true);
 		btn_towerB.SetActive (true);
 		btn_towerC.SetActive (true);
+		btn_reset.SetActive (false);
+	}
+
+	public void AllButtonLockExceptReset(){
+		btn_towerA.SetActive (false);
+		btn_towerB.SetActive (false);
+		btn_towerC.SetActive (false);
+		btn_reset.SetActive (true);
 	}
 
 	public void OneButtonClose(int button){
