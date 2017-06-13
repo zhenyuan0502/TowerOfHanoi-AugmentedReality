@@ -46,6 +46,19 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 	// Use this for initialization
 	void Start ()
 	{
+		// Lấy Tower
+		TowerC = GameObject.Find ("TowerC");
+		TowerB = GameObject.Find ("TowerB");
+		TowerA = GameObject.Find ("TowerA");
+
+		// Lấy vị trí của các cột
+		pTowerC = TowerC.transform.position.x;
+		pTowerB = TowerB.transform.position.x;
+		pTowerA = TowerA.transform.position.x;
+
+		// Sai nhục quá
+		AmoutOfDisk = GameLevel.currentLevel;
+
 		// Khởi tạo vị trí tọa độ Y của torus, tọa độ Y này sẽ không thay đổi
 		positionY_of_level = new float[9];
 
@@ -61,21 +74,30 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 
 		// Lấy torus đồng thời đổ vào list tower A
 		torus = new GameObject[9];
-		for (int i = 1; i <= 8; i++) {
+		for (int i = 1, j = 1; i <= 8; i++) {
 			torus [i] = GameObject.Find ("Torus (" + i + ")");
-			positionY_of_level [i] = torus [i].transform.position.y;
+
+			if (i >= 8 - AmoutOfDisk + j) {
+				positionY_of_level [j] = torus [i].transform.position.y;
+				j++;
+			}
+
+			if (i > AmoutOfDisk) {
+				torus [i].SetActive (false);
+			}
 		}
 
-//		positionY_of_level 1: -
-//		positionY_of_level 2: --
-//		positionY_of_level 3: ---
-//		positionY_of_level 4: ----
-//		positionY_of_level 5: -----
-//		positionY_of_level 6: ------
-//		positionY_of_level 7: -------
-//		positionY_of_level 8: --------
+//		default								8 torus								3 torus
+//		torus[1].transfrom.position.y		positionY_of_level 1: -
+//		torus[2].transfrom.position.y		positionY_of_level 2: --
+//		torus[3].transfrom.position.y		positionY_of_level 3: ---
+//		torus[4].transfrom.position.y		positionY_of_level 4: ----
+//		torus[5].transfrom.position.y		positionY_of_level 5: -----
+//		torus[6].transfrom.position.y		positionY_of_level 6: ------		positionY_of_level 1: -
+//		torus[7].transfrom.position.y		positionY_of_level 7: -------		positionY_of_level 2: --
+//		torus[8].transfrom.position.y		positionY_of_level 8: --------		positionY_of_level 3: ---
 
-		for (int i = 8; i >= 1; i--) {
+		for (int i = AmoutOfDisk; i >= 1; i--) {
 			// Đổ vào list A
 			stkTowerA.Push (torus [i]);
 		}
@@ -87,25 +109,14 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 		txt_message = GameObject.Find ("message").GetComponent<TextMesh> ();
 
 
-		// Lấy Tower
-		TowerC = GameObject.Find ("TowerC");
-		TowerB = GameObject.Find ("TowerB");
-		TowerA = GameObject.Find ("TowerA");
-
 		// Lấy Z mặc định (của cột)
 		defaultZ = TowerA.transform.position.z;
-
-		// Lấy vị trí của các cột
-		pTowerC = TowerC.transform.position.x;
-		pTowerB = TowerB.transform.position.x;
-		pTowerA = TowerA.transform.position.x;
 
 		btn_towerA.GetComponent<VirtualButtonBehaviour> ().RegisterEventHandler (this);
 		btn_towerB.GetComponent<VirtualButtonBehaviour> ().RegisterEventHandler (this);
 		btn_towerC.GetComponent<VirtualButtonBehaviour> ().RegisterEventHandler (this);
 
-		// Sai nhục quá
-		AmoutOfDisk = GameLevel.currentLevel;
+
 		txt_message.text = "Amout of Disk: " + AmoutOfDisk;
 	}
 
@@ -193,19 +204,18 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 	// Update is called once per frame
 	void Update ()
 	{	
-		
-		print (stkTowerA, pTowerA, defaultZ, positionY_of_level);
-		print (stkTowerB, pTowerB, defaultZ, positionY_of_level);
-		print (stkTowerC, pTowerC, defaultZ, positionY_of_level);
+		print (stkTowerA, pTowerA, defaultZ, positionY_of_level, AmoutOfDisk);
+		print (stkTowerB, pTowerB, defaultZ, positionY_of_level, AmoutOfDisk);
+		print (stkTowerC, pTowerC, defaultZ, positionY_of_level, AmoutOfDisk);
 	}
 
-	public static void print (Stack<GameObject> stkTower, float pTower, float defaultZ, float[] positionY_of_level)
+	public static void print (Stack<GameObject> stkTower, float pTower, float defaultZ, float[] positionY_of_level, int AmoutOfDisk)
 	{
 		int count = stkTower.Count;
 		int element = 1;
 		// item lấy từ 1 -> hết stack
 		foreach (var item in stkTower) {
-			item.transform.position = new Vector3 (pTower, positionY_of_level [8 - count + element], defaultZ);
+			item.transform.position = new Vector3 (pTower, positionY_of_level [AmoutOfDisk - count + element], defaultZ);
 			element++;
 		}
 	}

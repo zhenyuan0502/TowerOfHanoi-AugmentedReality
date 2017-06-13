@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class GameLevelButton : MonoBehaviour {
 	
-	public int levelNr = 3;
+	public int levelNr = 0;
 
 	public void StartLevel()
 	{
