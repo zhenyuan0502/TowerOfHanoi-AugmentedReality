@@ -16,6 +16,7 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 	private GameObject btn_towerB;
 	private GameObject btn_towerC;
 	private GameObject btn_reset;
+	private GameObject btn_continue;
 
 	private TextMesh txt_message;
 
@@ -44,176 +45,114 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 
 	int flag = 1;
 
+	private const int FLAG_TOWER_A = 1;
+	private const int FLAG_TOWER_B = 2;
+	private const int FLAG_TOWER_C = 3;
+
 	int AmoutOfDisk = 0;
+	bool isManualPlay = false;
 
 	// Use this for initialization
 	void Start ()
 	{
-		// Lấy Tower
-		TowerC = GameObject.Find ("TowerC");
-		TowerB = GameObject.Find ("TowerB");
-		TowerA = GameObject.Find ("TowerA");
+		InitComponents ();
+		GetObjectPosition ();
+		InitGameModeAndLevel ();
+		InitStacks();
+		InitFirstState ();
+		InitListeners ();
 
-		// Lấy vị trí của các cột
-		pTowerC = TowerC.transform.position.x;
-		pTowerB = TowerB.transform.position.x;
-		pTowerA = TowerA.transform.position.x;
-
-		// Sai nhục quá
-		AmoutOfDisk = GameLevel.currentLevel;
-
-		// Khởi tạo vị trí tọa độ Y của torus, tọa độ Y này sẽ không thay đổi
-		positionY_of_level = new float[9];
-
-		// Lưu ý: POP luôn là trên cùng
-		// Khởi tạo stack Tower A
-		stkTowerA = new Stack<GameObject> ();
-
-		// Khởi tạo stack Tower B
-		stkTowerB = new Stack<GameObject> ();
-
-		// Khởi tạo stack Tower C
-		stkTowerC = new Stack<GameObject> ();
-
-		// Lấy torus đồng thời đổ vào list tower A
-		torus = new GameObject[9];
-		for (int i = 1, j = 1; i <= 8; i++) {
-			torus [i] = GameObject.Find ("Torus (" + i + ")");
-
-			if (i >= 8 - AmoutOfDisk + j) {
-				if (torus [i] != null) {
-					positionY_of_level [j] = torus [i].transform.position.y;
-					++j;
-				}
-			}
+		if (isManualPlay) {
+			ButtonManualMode ();
+		} else {
+			ButtonAutoMode ();
 		}
-
-
-		for (int i = AmoutOfDisk + 1; i <= 8; i++) {
-			torus [i].SetActive (false);
-		}
-
-//		default								8 torus								3 torus
-//		torus[1].transfrom.position.y		positionY_of_level 1: -
-//		torus[2].transfrom.position.y		positionY_of_level 2: --
-//		torus[3].transfrom.position.y		positionY_of_level 3: ---
-//		torus[4].transfrom.position.y		positionY_of_level 4: ----
-//		torus[5].transfrom.position.y		positionY_of_level 5: -----
-//		torus[6].transfrom.position.y		positionY_of_level 6: ------		positionY_of_level 1: -
-//		torus[7].transfrom.position.y		positionY_of_level 7: -------		positionY_of_level 2: --
-//		torus[8].transfrom.position.y		positionY_of_level 8: --------		positionY_of_level 3: ---
-
-		for (int i = AmoutOfDisk; i >= 1; i--) {
-			// Đổ vào list A
-			stkTowerA.Push (torus [i]);
-		}
-
-		// Lấy button của Tower
-		btn_towerA = GameObject.Find ("btn_towerA");
-		btn_towerB = GameObject.Find ("btn_towerB");
-		btn_towerC = GameObject.Find ("btn_towerC");
-		btn_reset = GameObject.Find ("btn_reset");
-
-		txt_message = GameObject.Find ("message").GetComponent<TextMesh> ();
-
-		// Ẩn btn reset
-		btn_reset.SetActive(false);
-
-		// Lấy Z mặc định (của cột)
-		defaultZ = TowerA.transform.position.z;
-
-		btn_towerA.GetComponent<VirtualButtonBehaviour> ().RegisterEventHandler (this);
-		btn_towerB.GetComponent<VirtualButtonBehaviour> ().RegisterEventHandler (this);
-		btn_towerC.GetComponent<VirtualButtonBehaviour> ().RegisterEventHandler (this);
-
-		btn_reset.GetComponent<VirtualButtonBehaviour> ().RegisterEventHandler (this);
-
-
-		txt_message.text = "Amout of Disk: " + AmoutOfDisk;
-
-
 	}
 
 	// Khi button được nhấn, chỉ thay đổi X và Y, không thay đổi Z
 	public void OnButtonPressed (VirtualButtonAbstractBehaviour vButton)
 	{
-		switch (vButton.VirtualButtonName) {
-		case "btn_towerA":
-			if (!isWin) {
-				Debug.Log ("On A Press");
-
-				if (hold) {
-					Debug.Log ("On A Press");
-					switch (flag) {
-					case 2:
-						MoveTorus (stkTowerB, stkTowerA);
-						break;
-					case 3:
-						MoveTorus (stkTowerC, stkTowerA);
-						break;
+		if (isManualPlay) {
+			switch (vButton.VirtualButtonName) {
+			case "btn_towerA":
+				if (!isWin) {
+					if (hold) {
+						Debug.Log ("On A Press");
+						switch (flag) {
+						case FLAG_TOWER_B:
+							MoveTorus (stkTowerB, stkTowerA);
+							break;
+						case FLAG_TOWER_C:
+							MoveTorus (stkTowerC, stkTowerA);
+							break;
+						}
+						hold = false;
+						AllButtonReleaseExceptReset ();
+					} else {
+						flag = FLAG_TOWER_A;
+						hold = true;
+						OneButtonClose (BUTTON_A);
 					}
-					hold = false;
-					AllButtonReleaseExceptReset ();
-				} else {
-					flag = 1;
-					hold = true;
-					OneButtonClose (BUTTON_A);
 				}
-			}
 
-			break;
-		case "btn_towerB": 
-			if (!isWin) {
-				Debug.Log ("On B Press");
-				if (hold) {
-					switch (flag) {
-					case 1:
-						MoveTorus (stkTowerA, stkTowerB);
-						break;
-					case 3:
-						MoveTorus (stkTowerC, stkTowerB);
-						break;
+				break;
+			case "btn_towerB": 
+				if (!isWin) {
+					if (hold) {
+						Debug.Log ("On B Press");
+
+						switch (flag) {
+						case FLAG_TOWER_A:
+							MoveTorus (stkTowerA, stkTowerB);
+							break;
+						case FLAG_TOWER_C:
+							MoveTorus (stkTowerC, stkTowerB);
+							break;
+						}
+						hold = false;
+						AllButtonReleaseExceptReset ();
+
+					} else {
+						flag = FLAG_TOWER_B;
+						hold = true;
+						OneButtonClose (BUTTON_B);
 					}
-					hold = false;
-					AllButtonReleaseExceptReset ();
-
-				} else {
-					flag = 2;
-					hold = true;
-					OneButtonClose (BUTTON_B);
 				}
-			}
-			break;
-		case "btn_towerC": 
-			if (!isWin) {
-				Debug.Log ("On C Press");
-				if (hold) {
-					switch (flag) {
-					case 1:
-						MoveTorus (stkTowerA, stkTowerC);
-						break;
-					case 2:
-						MoveTorus (stkTowerB, stkTowerC);
-						break;
+				break;
+			case "btn_towerC": 
+				if (!isWin) {
+					if (hold) {
+						Debug.Log ("On C Press");
+
+						switch (flag) {
+						case FLAG_TOWER_A:
+							MoveTorus (stkTowerA, stkTowerC);
+							break;
+						case FLAG_TOWER_B:
+							MoveTorus (stkTowerB, stkTowerC);
+							break;
+						}
+						hold = false;
+						AllButtonReleaseExceptReset ();
+
+					} else {
+						flag = FLAG_TOWER_C;
+						hold = true;
+						OneButtonClose (BUTTON_C);
 					}
-					hold = false;
-					AllButtonReleaseExceptReset ();
-
-				} else {
-					flag = 3;
-					hold = true;
-					OneButtonClose (BUTTON_C);
 				}
-			}
 
-			break;
+				break;
 
-		case "btn_reset":
-			if (isWin) {
-				Debug.Log ("On Reset Press");
-				SceneManager.LoadScene ("Menu 3D");
+			case "btn_reset":
+				if (isWin) {
+					Debug.Log ("On Reset Press");
+					SceneManager.LoadScene ("Menu 3D");
+				}
+				break;
 			}
-			break;
+		} else {
+
 		}
 	}
 
@@ -229,19 +168,28 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 		case "btn_towerC": 
 			Debug.Log ("On C Release");
 			break;
+		case "btn_reset": 
+			Debug.Log ("On Reset Release");
+			break;
 		}
 	}
 
 	// Update is called once per frame
 	void Update ()
-	{	if (stkTowerC.Count == AmoutOfDisk) {
+	{	
+		if (stkTowerC.Count == AmoutOfDisk) {
 			txt_message.text = "You Win !!!\nClick to comeback";
 			isWin = true;
 			AllButtonLockExceptReset ();
+
+			if (!isManualPlay) {
+				btn_continue.SetActive (false);
+			}
 		} 
-			print (stkTowerA, pTowerA, defaultZ, positionY_of_level, AmoutOfDisk);
-			print (stkTowerB, pTowerB, defaultZ, positionY_of_level, AmoutOfDisk);
-			print (stkTowerC, pTowerC, defaultZ, positionY_of_level, AmoutOfDisk);
+
+		print (stkTowerA, pTowerA, defaultZ, positionY_of_level, AmoutOfDisk);
+		print (stkTowerB, pTowerB, defaultZ, positionY_of_level, AmoutOfDisk);
+		print (stkTowerC, pTowerC, defaultZ, positionY_of_level, AmoutOfDisk);
 
 	}
 
@@ -270,10 +218,117 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 		btn_reset.SetActive (true);
 	}
 
+	public void ButtonManualMode(){
+		AllButtonReleaseExceptReset ();
+		btn_continue.SetActive (false);
+	}
+
+	public void ButtonAutoMode(){
+		AllButtonLockExceptReset ();
+		btn_continue.SetActive (true);
+	}
+
 	public void OneButtonClose(int button){
 		btn_towerA.SetActive (!(button == BUTTON_A));
 		btn_towerB.SetActive (!(button == BUTTON_B));
 		btn_towerC.SetActive (!(button == BUTTON_C));
+	}
+
+	public void InitStacks(){
+		// Lưu ý: POP luôn là trên cùng
+
+		// Khởi tạo stack Tower A
+		stkTowerA = new Stack<GameObject> ();
+
+		// Khởi tạo stack Tower B
+		stkTowerB = new Stack<GameObject> ();
+
+		// Khởi tạo stack Tower C
+		stkTowerC = new Stack<GameObject> ();
+	}
+
+	public void InitComponents (){
+		// Lấy Tower
+		TowerC = GameObject.Find ("TowerC");
+		TowerB = GameObject.Find ("TowerB");
+		TowerA = GameObject.Find ("TowerA");
+
+		// Lấy button của Tower
+		btn_towerA = GameObject.Find ("btn_towerA");
+		btn_towerB = GameObject.Find ("btn_towerB");
+		btn_towerC = GameObject.Find ("btn_towerC");
+		btn_reset = GameObject.Find ("btn_reset");
+		btn_continue = GameObject.Find ("btn_continue");
+
+		txt_message = GameObject.Find ("message").GetComponent<TextMesh> ();
+	}
+
+	public void InitListeners(){
+		btn_towerA.GetComponent<VirtualButtonBehaviour> ().RegisterEventHandler (this);
+		btn_towerB.GetComponent<VirtualButtonBehaviour> ().RegisterEventHandler (this);
+		btn_towerC.GetComponent<VirtualButtonBehaviour> ().RegisterEventHandler (this);
+		btn_reset.GetComponent<VirtualButtonBehaviour> ().RegisterEventHandler (this);
+		btn_continue.GetComponent<VirtualButtonBehaviour> ().RegisterEventHandler (this);
+	}
+
+	public void InitGameModeAndLevel(){
+		// Lấy giá trị level hiện tại
+		AmoutOfDisk = GameLevel.currentLevel;
+
+		// Lấy chế độ hiện tại: người chơi hoặc máy tự chơi
+		isManualPlay = GameLevel.isManualPlay;
+	}
+
+	public void GetObjectPosition(){
+		// Lấy vị trí của các cột
+		pTowerC = TowerC.transform.position.x;
+		pTowerB = TowerB.transform.position.x;
+		pTowerA = TowerA.transform.position.x;
+
+		// Lấy Z mặc định (của cột)
+		defaultZ = TowerA.transform.position.z;
+
+		// Khởi tạo vị trí tọa độ Y của torus, tọa độ Y này sẽ không thay đổi
+		positionY_of_level = new float[9];
+	}
+
+	public void InitFirstState(){
+		// Lấy torus đồng thời đổ vào list tower A
+		torus = new GameObject[9];
+		for (int i = 1, j = 1; i <= 8; i++) {
+			torus [i] = GameObject.Find ("Torus (" + i + ")");
+
+			if (i >= 8 - AmoutOfDisk + j) {
+				if (torus [i] != null) {
+					positionY_of_level [j] = torus [i].transform.position.y;
+					++j;
+				}
+			}
+		}
+
+		for (int i = AmoutOfDisk + 1; i <= 8; i++) {
+			torus [i].SetActive (false);
+		}
+
+		//		default								8 torus								3 torus
+		//		torus[1].transfrom.position.y		positionY_of_level 1: -
+		//		torus[2].transfrom.position.y		positionY_of_level 2: --
+		//		torus[3].transfrom.position.y		positionY_of_level 3: ---
+		//		torus[4].transfrom.position.y		positionY_of_level 4: ----
+		//		torus[5].transfrom.position.y		positionY_of_level 5: -----
+		//		torus[6].transfrom.position.y		positionY_of_level 6: ------		positionY_of_level 1: -
+		//		torus[7].transfrom.position.y		positionY_of_level 7: -------		positionY_of_level 2: --
+		//		torus[8].transfrom.position.y		positionY_of_level 8: --------		positionY_of_level 3: ---
+
+		for (int i = AmoutOfDisk; i >= 1; i--) {
+			// Đổ vào list A
+			stkTowerA.Push (torus [i]);
+		}
+
+		// Ẩn btn reset
+		btn_reset.SetActive(false);
+		txt_message.text = "Amout of Disk: " + AmoutOfDisk;
+
 	}
 
 	public void MoveTorus(Stack<GameObject> stk_from, Stack<GameObject> stk_to){
