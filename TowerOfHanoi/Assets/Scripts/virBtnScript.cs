@@ -152,7 +152,7 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 				break;
 			}
 		} else {
-
+			
 		}
 	}
 
@@ -173,6 +173,7 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 			break;
 		}
 	}
+	bool readynow = true;
 
 	// Update is called once per frame
 	void Update ()
@@ -187,9 +188,22 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 			}
 		} 
 
+		if (!isManualPlay && readynow) {
+			StartCoroutine (AutoPlay());
+		}
+
 		print (stkTowerA, pTowerA, defaultZ, positionY_of_level, AmoutOfDisk);
 		print (stkTowerB, pTowerB, defaultZ, positionY_of_level, AmoutOfDisk);
 		print (stkTowerC, pTowerC, defaultZ, positionY_of_level, AmoutOfDisk);
+
+
+	}
+
+	IEnumerator AutoPlay(){
+		readynow = false;
+		AutoMoveTorus (AmoutOfDisk, stkTowerA, stkTowerC, stkTowerB);
+		yield return new WaitForSeconds( 1 );
+		readynow = true;
 
 	}
 
@@ -352,5 +366,19 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 		} else {
 			txt_message.text = "Can't move !!";
 		}
+	}
+
+	public static void AutoMoveTorus(int AmoutOfDisk, Stack<GameObject> stk_from, Stack<GameObject> stk_to, Stack<GameObject> stk_other){
+		if (AmoutOfDisk == 1)
+		{
+			stk_to.Push(stk_from.Pop());
+			return;
+		}
+
+		AutoMoveTorus(AmoutOfDisk - 1, stk_from, stk_other, stk_to);
+
+		stk_to.Push(stk_from.Pop());
+
+		AutoMoveTorus(AmoutOfDisk - 1, stk_other, stk_to, stk_from);
 	}
 }
