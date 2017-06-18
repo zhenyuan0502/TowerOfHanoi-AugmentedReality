@@ -5,6 +5,6 @@ using UnityEngine;
 public class GameLevel : MonoBehaviour {
 
 	public static int currentLevel = 3;
-	public static bool isManualPlay = true;
+	public static bool isManualPlay = false;
 
 }

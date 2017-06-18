@@ -207,9 +207,15 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 	}
 
 	public void AllButtonReleaseExceptReset(){
-		btn_towerA.SetActive (true);
-		btn_towerB.SetActive (true);
-		btn_towerC.SetActive (true);
+		if (btn_towerA != null) {
+			btn_towerA.SetActive (true);
+		}
+		if (btn_towerB != null) {
+			btn_towerB.SetActive (true);
+		}
+		if (btn_towerC != null) {
+			btn_towerC.SetActive (true);
+		}
 		if (btn_reset != null) {
 			btn_reset.SetActive (false);
 
@@ -217,9 +223,15 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 	}
 
 	public void AllButtonLockExceptReset(){
-		btn_towerA.SetActive (false);
-		btn_towerB.SetActive (false);
-		btn_towerC.SetActive (false);
+		if (btn_towerA != null) {
+			btn_towerA.SetActive (false);
+		}
+		if (btn_towerB != null) {
+			btn_towerB.SetActive (false);
+		}
+		if (btn_towerC != null) {
+			btn_towerC.SetActive (false);
+		}
 		if (btn_reset != null) {
 			btn_reset.SetActive (true);
 		}
@@ -276,9 +288,19 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 	}
 
 	public void InitListeners(){
-		btn_towerA.GetComponent<VirtualButtonBehaviour> ().RegisterEventHandler (this);
-		btn_towerB.GetComponent<VirtualButtonBehaviour> ().RegisterEventHandler (this);
-		btn_towerC.GetComponent<VirtualButtonBehaviour> ().RegisterEventHandler (this);
+		if (btn_towerA != null) {
+			btn_towerA.GetComponent<VirtualButtonBehaviour> ().RegisterEventHandler (this);
+		}
+
+		if (btn_towerB != null) {
+			btn_towerB.GetComponent<VirtualButtonBehaviour> ().RegisterEventHandler (this);
+		}
+
+		if (btn_towerC != null) {
+			btn_towerC.GetComponent<VirtualButtonBehaviour> ().RegisterEventHandler (this);
+
+		}
+
 		if (btn_reset != null) {
 			btn_reset.GetComponent<VirtualButtonBehaviour> ().RegisterEventHandler (this);
 		}
@@ -422,9 +444,9 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 			txt_timer.text = minutes + ":" + seconds;
 		}
 
-		if (!isManualPlay && readynow) {
-			StartCoroutine (AutoPlay());
-		}
+//		if (!isManualPlay && readynow) {
+//			StartCoroutine (AutoPlay());
+//		}
 
 		print (stkTowerA, pTowerA, defaultZ, positionY_of_level, AmoutOfDisk);
 		print (stkTowerB, pTowerB, defaultZ, positionY_of_level, AmoutOfDisk);
