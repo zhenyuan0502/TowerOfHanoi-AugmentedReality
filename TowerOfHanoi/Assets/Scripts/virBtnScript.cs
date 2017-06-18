@@ -19,6 +19,7 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 	private GameObject btn_continue;
 
 	private TextMesh txt_message;
+	private TextMesh txt_timer;
 
 	private GameObject TowerA;
 	private GameObject TowerB;
@@ -55,6 +56,8 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 	int Steps = 0;
 	float Point = 0;
 	int MinimumSteps = 0;
+	float Timer = 0.0f;
+	bool isPlaying = false;
 
 	// Use this for initialization
 	void Start ()
@@ -74,8 +77,11 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 	}
 
 	// Khi button được nhấn, chỉ thay đổi X và Y, không thay đổi Z
+	// Thời gian cũng được đếm
 	public void OnButtonPressed (VirtualButtonAbstractBehaviour vButton)
 	{
+		isPlaying = true;
+
 		if (isManualPlay) {
 			switch (vButton.VirtualButtonName) {
 			case "btn_towerA":
@@ -179,32 +185,7 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 	}
 	bool readynow = true;
 
-	// Update is called once per frame
-	void Update ()
-	{	
-		if (stkTowerC.Count == AmoutOfDisk) {
-			MinimumSteps = ((int) Mathf.Pow (2.0f, AmoutOfDisk)) - 1;
-//			(MinimumSteps - (Steps - MinimumSteps))*100/MinimumSteps
-			Point = (2*MinimumSteps - Steps)*100/MinimumSteps;
-			txt_message.text = "You Win !!!\nSteps: " + Steps +"\nMinimum Steps: " + MinimumSteps +"\nPoint: "+ Point +"\nClick to comeback";
-			isWin = true;
-			AllButtonLockExceptReset ();
 
-			if (!isManualPlay) {
-				btn_continue.SetActive (false);
-			}
-		} 
-
-		if (!isManualPlay && readynow) {
-			StartCoroutine (AutoPlay());
-		}
-
-		print (stkTowerA, pTowerA, defaultZ, positionY_of_level, AmoutOfDisk);
-		print (stkTowerB, pTowerB, defaultZ, positionY_of_level, AmoutOfDisk);
-		print (stkTowerC, pTowerC, defaultZ, positionY_of_level, AmoutOfDisk);
-
-
-	}
 
 	IEnumerator AutoPlay(){
 		readynow = false;
@@ -291,6 +272,7 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 		btn_continue = GameObject.Find ("btn_continue");
 
 		txt_message = GameObject.Find ("message").GetComponent<TextMesh> ();
+		txt_timer = GameObject.Find ("timer").GetComponent<TextMesh> ();
 	}
 
 	public void InitListeners(){
@@ -371,6 +353,8 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 			txt_message.text = "Amout of Disk: " + AmoutOfDisk;
 		}
 
+
+
 	}
 
 	public void MoveTorus(Stack<GameObject> stk_from, Stack<GameObject> stk_to){
@@ -410,5 +394,42 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 		stk_to.Push(stk_from.Pop());
 
 		AutoMoveTorus(AmoutOfDisk - 1, stk_other, stk_to, stk_from);
+	}
+
+	// Update is called once per frame
+	void Update ()
+	{	
+		if (stkTowerC.Count == AmoutOfDisk) {
+			MinimumSteps = ((int)Mathf.Pow (2.0f, AmoutOfDisk)) - 1;
+			//			(MinimumSteps - (Steps - MinimumSteps))*100/MinimumSteps
+			Point = (2 * MinimumSteps - Steps) * 100 / MinimumSteps;
+			txt_message.text = "You Win !!!\nSteps " + Steps + " - Point " + Point +"\nMinimum Steps " + MinimumSteps +  "\nClick to comeback";
+			isWin = true;
+			AllButtonLockExceptReset ();
+
+			if (!isManualPlay) {
+				btn_continue.SetActive (false);
+			}
+		} else {
+			if (isPlaying) {
+				Timer += Time.deltaTime;
+			}
+		}
+
+		if (txt_timer != null && isPlaying) {
+			string minutes = ((int)Timer / 60).ToString();
+			string seconds = (Timer % 60).ToString("F2");
+			txt_timer.text = minutes + ":" + seconds;
+		}
+
+		if (!isManualPlay && readynow) {
+			StartCoroutine (AutoPlay());
+		}
+
+		print (stkTowerA, pTowerA, defaultZ, positionY_of_level, AmoutOfDisk);
+		print (stkTowerB, pTowerB, defaultZ, positionY_of_level, AmoutOfDisk);
+		print (stkTowerC, pTowerC, defaultZ, positionY_of_level, AmoutOfDisk);
+
+
 	}
 }
