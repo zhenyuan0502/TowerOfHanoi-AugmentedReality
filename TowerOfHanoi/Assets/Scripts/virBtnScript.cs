@@ -222,24 +222,33 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 		btn_towerA.SetActive (true);
 		btn_towerB.SetActive (true);
 		btn_towerC.SetActive (true);
-		btn_reset.SetActive (false);
+		if (btn_reset != null) {
+			btn_reset.SetActive (false);
+
+		}
 	}
 
 	public void AllButtonLockExceptReset(){
 		btn_towerA.SetActive (false);
 		btn_towerB.SetActive (false);
 		btn_towerC.SetActive (false);
-		btn_reset.SetActive (true);
+		if (btn_reset != null) {
+			btn_reset.SetActive (true);
+		}
 	}
 
 	public void ButtonManualMode(){
 		AllButtonReleaseExceptReset ();
-		btn_continue.SetActive (false);
+		if (btn_continue != null) {
+			btn_continue.SetActive (false);
+		}
 	}
 
 	public void ButtonAutoMode(){
 		AllButtonLockExceptReset ();
-		btn_continue.SetActive (true);
+		if (btn_continue != null) {
+			btn_continue.SetActive (true);
+		}
 	}
 
 	public void OneButtonClose(int button){
@@ -281,8 +290,13 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 		btn_towerA.GetComponent<VirtualButtonBehaviour> ().RegisterEventHandler (this);
 		btn_towerB.GetComponent<VirtualButtonBehaviour> ().RegisterEventHandler (this);
 		btn_towerC.GetComponent<VirtualButtonBehaviour> ().RegisterEventHandler (this);
-		btn_reset.GetComponent<VirtualButtonBehaviour> ().RegisterEventHandler (this);
-		btn_continue.GetComponent<VirtualButtonBehaviour> ().RegisterEventHandler (this);
+		if (btn_reset != null) {
+			btn_reset.GetComponent<VirtualButtonBehaviour> ().RegisterEventHandler (this);
+		}
+
+		if (btn_continue != null) {
+			btn_continue.GetComponent<VirtualButtonBehaviour> ().RegisterEventHandler (this);
+		}
 	}
 
 	public void InitGameModeAndLevel(){
@@ -320,9 +334,11 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 			}
 		}
 
-		for (int i = AmoutOfDisk + 1; i <= 8; i++) {
-			torus [i].SetActive (false);
-		}
+//		for (int i = AmoutOfDisk + 1; i <= 8; i++) {
+//			if (torus [i] != null) {
+//				torus [i].SetActive (false);
+//			}
+//		}
 
 		//		default								8 torus								3 torus
 		//		torus[1].transfrom.position.y		positionY_of_level 1: -
@@ -340,8 +356,13 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 		}
 
 		// Ẩn btn reset
-		btn_reset.SetActive(false);
-		txt_message.text = "Amout of Disk: " + AmoutOfDisk;
+		if (btn_reset != null) {
+			btn_reset.SetActive(false);
+		}
+
+		if (txt_message != null) {
+			txt_message.text = "Amout of Disk: " + AmoutOfDisk;
+		}
 
 	}
 

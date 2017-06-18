@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class GameLevel : MonoBehaviour {
 
-	public static int currentLevel = 7;
+	public static int currentLevel = 4;
 	public static bool isManualPlay = true;
 
 }
