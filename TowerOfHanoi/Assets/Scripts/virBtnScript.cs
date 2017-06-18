@@ -52,6 +52,10 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 	int AmoutOfDisk = 0;
 	bool isManualPlay = false;
 
+	int Steps = 0;
+	float Point = 0;
+	int MinimumSteps = 0;
+
 	// Use this for initialization
 	void Start ()
 	{
@@ -179,7 +183,10 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 	void Update ()
 	{	
 		if (stkTowerC.Count == AmoutOfDisk) {
-			txt_message.text = "You Win !!!\nClick to comeback";
+			MinimumSteps = ((int) Mathf.Pow (2.0f, AmoutOfDisk)) - 1;
+//			(MinimumSteps - (Steps - MinimumSteps))*100/MinimumSteps
+			Point = (2*MinimumSteps - Steps)*100/MinimumSteps;
+			txt_message.text = "You Win !!!\nSteps: " + Steps +"\nMinimum Steps: " + MinimumSteps +"\nPoint: "+ Point +"\nClick to comeback";
 			isWin = true;
 			AllButtonLockExceptReset ();
 
@@ -372,13 +379,15 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 			if (stk_to.Count == 0) {
 				stk_from.Pop ();
 				stk_to.Push (temp_1);
-				txt_message.text = "Good !!";
+				Steps++;
+				txt_message.text = "Good !!\nSteps:" + Steps;
 			} else {
 				GameObject temp_2 = stk_to.Peek ();
 				if (int.Parse (temp_1.name.Substring (7, 1)) < int.Parse (temp_2.name.Substring (7, 1))) {
 					stk_from.Pop ();
 					stk_to.Push (temp_1);
-					txt_message.text = "Excellent !!";
+					Steps++;
+					txt_message.text = "Excellent !!\nSteps:" + Steps;
 				} else {
 					txt_message.text = "Invalid !!";
 				}
