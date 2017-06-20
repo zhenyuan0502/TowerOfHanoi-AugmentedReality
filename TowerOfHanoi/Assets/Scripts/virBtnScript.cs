@@ -43,6 +43,7 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 
 	bool isWin = false;
 	bool hold = false;
+	bool readynow = false;
 
 	int flag = 1;
 
@@ -72,6 +73,8 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 		if (isManualPlay) {
 			ButtonManualMode ();
 		} else {
+			// bắt đầu tự động chạy game
+			isPlaying = true;
 			ButtonAutoMode ();
 		}
 	}
@@ -162,7 +165,18 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 				break;
 			}
 		} else {
-			
+			switch (vButton.VirtualButtonName) {
+			case "btn_continue":
+				Debug.Log ("On Continue Press");
+				readynow = true;
+				break;
+			case "btn_reset":
+				if (isWin) {
+					Debug.Log ("On Reset Press");
+					SceneManager.LoadScene ("Menu 3D");
+				}
+				break;
+			}
 		}
 	}
 
@@ -183,17 +197,7 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 			break;
 		}
 	}
-	bool readynow = true;
 
-
-
-	IEnumerator AutoPlay(){
-		readynow = false;
-		AutoMoveTorus (AmoutOfDisk, stkTowerA, stkTowerC, stkTowerB);
-		yield return new WaitForSeconds( 1 );
-		readynow = true;
-
-	}
 
 	public static void print (Stack<GameObject> stkTower, float pTower, float defaultZ, float[] positionY_of_level, int AmoutOfDisk)
 	{
@@ -404,19 +408,41 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 		}
 	}
 
-	public static void AutoMoveTorus(int AmoutOfDisk, Stack<GameObject> stk_from, Stack<GameObject> stk_to, Stack<GameObject> stk_other){
-		if (AmoutOfDisk == 1)
-		{
-			stk_to.Push(stk_from.Pop());
-			return;
-		}
 
-		AutoMoveTorus(AmoutOfDisk - 1, stk_from, stk_other, stk_to);
 
-		stk_to.Push(stk_from.Pop());
-
-		AutoMoveTorus(AmoutOfDisk - 1, stk_other, stk_to, stk_from);
-	}
+//	IEnumerator AutoPlay(){
+//		readynow = false;
+//		AutoMoveTorus (AmoutOfDisk, stkTowerA, stkTowerC, stkTowerB);
+//		yield return new WaitForSeconds( 1 );
+//
+//		readynow = true;
+//	}
+//
+//	IEnumerator AutoMoveTorus(int AmoutOfDisk, Stack<GameObject> stk_from, Stack<GameObject> stk_to, Stack<GameObject> stk_other){
+//		readynow = false;
+//
+////		if (AmoutOfDisk == 1) {
+////			MoveTorus (stk_from, stk_to);
+////			yield break;
+////		} else {
+////			AutoMoveTorus(AmoutOfDisk - 1, stk_from, stk_other, stk_to);
+////			MoveTorus (stk_from, stk_to);
+////			AutoMoveTorus(AmoutOfDisk - 1, stk_other, stk_to, stk_from);
+////		}
+//
+//				if (AmoutOfDisk == 1) {
+//					MoveTorus (stk_from, stk_to);
+//					yield break;
+//				} 
+//					AutoMoveTorus(AmoutOfDisk - 1, stk_from, stk_other, stk_to);
+//					AutoMoveTorus(AmoutOfDisk - 1, stk_other, stk_to, stk_from);
+//					MoveTorus (stk_from, stk_to);
+//				
+//
+//		yield return new WaitForSeconds( 1 );
+//		readynow = true;
+//			
+//	}
 
 	// Update is called once per frame
 	void Update ()
@@ -438,20 +464,214 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 			}
 		}
 
+		// Cập nhật thời gian
 		if (txt_timer != null && isPlaying) {
 			string minutes = ((int)Timer / 60).ToString();
 			string seconds = (Timer % 60).ToString("F2");
 			txt_timer.text = minutes + ":" + seconds;
 		}
+		if (!isManualPlay && readynow && isPlaying && TowerA != null && TowerB!= null && TowerC != null)  {
+			StartCoroutine (Auto(stkTowerA, stkTowerB, stkTowerC, AmoutOfDisk));
+			if (stkTowerC.Count == AmoutOfDisk) {
+				isPlaying = false;
+			}
+		}
 
-//		if (!isManualPlay && readynow) {
-//			StartCoroutine (AutoPlay());
-//		}
+		printAll ();
+	}
 
+	void printAll(){
 		print (stkTowerA, pTowerA, defaultZ, positionY_of_level, AmoutOfDisk);
 		print (stkTowerB, pTowerB, defaultZ, positionY_of_level, AmoutOfDisk);
 		print (stkTowerC, pTowerC, defaultZ, positionY_of_level, AmoutOfDisk);
+	}
 
+	public IEnumerator Auto(Stack<GameObject> A, Stack<GameObject> B, Stack<GameObject> C, int AmoutOfDisk)
+	{
+		readynow = false;
+		if (A != null && B != null && C != null) {
+			if (AmoutOfDisk % 2 == 0)
+			{
+				while (true)
+				{
+					if (C.Count != AmoutOfDisk)
+					{
+						if (A.Count == 0)
+						{
+							yield return new WaitForSeconds( 1 ); MoveTorus (B, A);
+						}
+						else if (B.Count == 0)
+						{
+							yield return new WaitForSeconds( 1 ); MoveTorus (A, B);
+						}
+						else
+						{
+							if (A.Count > 0 && B.Count > 0) {
 
+								var disk1 = A.Peek ();
+								var disk2 = B.Peek ();
+								if (int.Parse (disk1.name.Substring (7, 1)) < int.Parse (disk2.name.Substring (7, 1))) {
+									yield return new WaitForSeconds (1);
+									MoveTorus (A, B);
+								} else {
+									yield return new WaitForSeconds (1);
+									MoveTorus (B, A);
+								}
+							}
+						}
+					}
+					else break;
+
+					if (C.Count != AmoutOfDisk)
+					{
+						if (A.Count == 0)
+						{
+							yield return new WaitForSeconds( 1 ); MoveTorus (C, A);
+						}
+						else
+							if (C.Count == 0)
+							{
+								yield return new WaitForSeconds( 1 ); MoveTorus (A, C);
+							}
+							else
+							{
+							if (A.Count > 0 && C.Count > 0) {
+
+								var disk1 = A.Peek ();
+								var disk2 = C.Peek ();
+								if (int.Parse (disk1.name.Substring (7, 1)) < int.Parse (disk2.name.Substring (7, 1))) {
+									yield return new WaitForSeconds (1);
+									MoveTorus (A, C);
+								} else {
+									yield return new WaitForSeconds (1);
+									MoveTorus (C, A);
+								}
+							}
+							}
+					}
+					else break;
+
+					if (C.Count != AmoutOfDisk)
+					{
+						if (B.Count == 0)
+						{
+							yield return new WaitForSeconds( 1 ); MoveTorus (C, B);
+						}
+						else
+							if (C.Count == 0)
+							{
+								yield return new WaitForSeconds( 1 ); MoveTorus (B, C);
+							}
+							else
+							{
+							if (B.Count > 0 && C.Count > 0) {
+
+								var disk1 = B.Peek ();
+								var disk2 = C.Peek ();
+								if (int.Parse (disk1.name.Substring (7, 1)) < int.Parse (disk2.name.Substring (7, 1))) {
+									yield return new WaitForSeconds (1);
+									MoveTorus (B, C);
+								} else {
+									yield return new WaitForSeconds (1);
+									MoveTorus (C, B);
+								}
+							}
+							}
+					}  
+					else break;
+				}
+			}
+			else
+			{
+				while (true)
+				{
+					if (C.Count != AmoutOfDisk)
+					{
+						if (A.Count == 0)
+						{
+							yield return new WaitForSeconds( 1 ); MoveTorus (C, A);
+						}
+						else
+							if (C.Count == 0)
+							{
+								yield return new WaitForSeconds( 1 ); MoveTorus (A, C);
+							}
+							else
+							{	
+								if (A.Count > 0 && C.Count > 0) {
+									var disk1 = A.Peek();
+									var disk2 = C.Peek();
+									if (int.Parse (disk1.name.Substring (7, 1)) < int.Parse (disk2.name.Substring (7, 1)))
+									{
+										yield return new WaitForSeconds( 1 ); MoveTorus (A, C);
+									}
+									else
+									{
+										yield return new WaitForSeconds( 1 ); MoveTorus (C, A);
+									}
+								}
+							}
+					}
+					else break;
+					if (C.Count != AmoutOfDisk)
+					{
+						if (A.Count == 0)
+						{
+							yield return new WaitForSeconds( 1 ); MoveTorus (B, A);
+						}
+						else
+							if (B.Count == 0)
+							{
+								yield return new WaitForSeconds( 1 ); MoveTorus (A, B);
+							}
+							else
+							{
+								if (A.Count > 0 && B.Count > 0) {
+
+									var disk1 = A.Peek ();
+									var disk2 = B.Peek ();
+									if (int.Parse (disk1.name.Substring (7, 1)) < int.Parse (disk2.name.Substring (7, 1))) {
+										yield return new WaitForSeconds (1);
+										MoveTorus (A, B);
+									} else {
+										yield return new WaitForSeconds (1);
+										MoveTorus (B, A);
+									}
+								}	
+							}
+					}
+					else break;
+					if (C.Count != AmoutOfDisk)
+					{
+						if (B.Count == 0)
+						{
+							yield return new WaitForSeconds( 1 ); MoveTorus (C, B);
+						}
+						else
+							if (C.Count == 0)
+							{
+								yield return new WaitForSeconds( 1 ); MoveTorus (B, C);
+							}
+							else
+							{
+							if (B.Count > 0 && C.Count > 0) {
+
+								var disk1 = B.Peek ();
+								var disk2 = C.Peek ();
+								if (int.Parse (disk1.name.Substring (7, 1)) < int.Parse (disk2.name.Substring (7, 1))) {
+									yield return new WaitForSeconds (1);
+									MoveTorus (B, C);
+								} else {
+									yield return new WaitForSeconds (1);
+									MoveTorus (C, B);
+								}
+							}
+							}
+					}
+					else break;
+				}
+			}
+		}
+		readynow = true;
 	}
 }
