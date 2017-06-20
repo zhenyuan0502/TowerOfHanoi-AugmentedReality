@@ -1871,7 +1871,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 11400002, guid: 2a725225d3d981b4182014a2e20b501c, type: 2}
       propertyPath: mPrevTransform.e03
-      value: -1.26
+      value: 1.26
       objectReference: {fileID: 0}
     - target: {fileID: 11400002, guid: 2a725225d3d981b4182014a2e20b501c, type: 2}
       propertyPath: mPrevTransform.e23
@@ -1923,7 +1923,7 @@ Prefab:
     - target: {fileID: 2300000, guid: 2a725225d3d981b4182014a2e20b501c, type: 2}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 74cbaa9886c83414197e0aba85beb922, type: 2}
+      objectReference: {fileID: 2100000, guid: fc17e66eb641644bfbbccd382381cbbf, type: 2}
     - target: {fileID: 2300000, guid: 2a725225d3d981b4182014a2e20b501c, type: 2}
       propertyPath: m_CastShadows
       value: 0
@@ -2813,7 +2813,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 2100000, guid: 74cbaa9886c83414197e0aba85beb922, type: 2}
+  - {fileID: 2100000, guid: fc17e66eb641644bfbbccd382381cbbf, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

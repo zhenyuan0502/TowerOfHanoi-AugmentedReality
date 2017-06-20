@@ -42,8 +42,9 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 	public float defaultY = 0;
 
 	bool isWin = false;
-	bool hold = false;
-	bool readynow = false;
+	bool isHolding = false;
+	bool readyNow = false;
+	bool isPlaying = false;
 
 	int flag = 1;
 
@@ -58,7 +59,6 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 	float Point = 0;
 	int MinimumSteps = 0;
 	float Timer = 0.0f;
-	bool isPlaying = false;
 
 	// Use this for initialization
 	void Start ()
@@ -73,8 +73,6 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 		if (isManualPlay) {
 			ButtonManualMode ();
 		} else {
-			// bắt đầu tự động chạy game
-			isPlaying = true;
 			ButtonAutoMode ();
 		}
 	}
@@ -89,7 +87,7 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 			switch (vButton.VirtualButtonName) {
 			case "btn_towerA":
 				if (!isWin) {
-					if (hold) {
+					if (isHolding) {
 						Debug.Log ("On A Press");
 						switch (flag) {
 						case FLAG_TOWER_B:
@@ -99,11 +97,11 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 							MoveTorus (stkTowerC, stkTowerA);
 							break;
 						}
-						hold = false;
+						isHolding = false;
 						AllButtonReleaseExceptReset ();
 					} else {
 						flag = FLAG_TOWER_A;
-						hold = true;
+						isHolding = true;
 						OneButtonClose (BUTTON_A);
 					}
 				}
@@ -111,7 +109,7 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 				break;
 			case "btn_towerB": 
 				if (!isWin) {
-					if (hold) {
+					if (isHolding) {
 						Debug.Log ("On B Press");
 
 						switch (flag) {
@@ -122,19 +120,19 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 							MoveTorus (stkTowerC, stkTowerB);
 							break;
 						}
-						hold = false;
+						isHolding = false;
 						AllButtonReleaseExceptReset ();
 
 					} else {
 						flag = FLAG_TOWER_B;
-						hold = true;
+						isHolding = true;
 						OneButtonClose (BUTTON_B);
 					}
 				}
 				break;
 			case "btn_towerC": 
 				if (!isWin) {
-					if (hold) {
+					if (isHolding) {
 						Debug.Log ("On C Press");
 
 						switch (flag) {
@@ -145,12 +143,12 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 							MoveTorus (stkTowerB, stkTowerC);
 							break;
 						}
-						hold = false;
+						isHolding = false;
 						AllButtonReleaseExceptReset ();
 
 					} else {
 						flag = FLAG_TOWER_C;
-						hold = true;
+						isHolding = true;
 						OneButtonClose (BUTTON_C);
 					}
 				}
@@ -168,13 +166,16 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 			switch (vButton.VirtualButtonName) {
 			case "btn_continue":
 				Debug.Log ("On Continue Press");
-				readynow = true;
+				if (!readyNow) {
+					// bắt đầu tự động chạy game
+					isPlaying = true;
+					readyNow = true;
+					btn_continue.SetActive (false);
+				}
 				break;
 			case "btn_reset":
-				if (isWin) {
-					Debug.Log ("On Reset Press");
-					SceneManager.LoadScene ("Menu 3D");
-				}
+				Debug.Log ("On Reset Press");
+				SceneManager.LoadScene ("Menu 3D");
 				break;
 			}
 		}
@@ -408,78 +409,6 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 		}
 	}
 
-
-
-//	IEnumerator AutoPlay(){
-//		readynow = false;
-//		AutoMoveTorus (AmoutOfDisk, stkTowerA, stkTowerC, stkTowerB);
-//		yield return new WaitForSeconds( 1 );
-//
-//		readynow = true;
-//	}
-//
-//	IEnumerator AutoMoveTorus(int AmoutOfDisk, Stack<GameObject> stk_from, Stack<GameObject> stk_to, Stack<GameObject> stk_other){
-//		readynow = false;
-//
-////		if (AmoutOfDisk == 1) {
-////			MoveTorus (stk_from, stk_to);
-////			yield break;
-////		} else {
-////			AutoMoveTorus(AmoutOfDisk - 1, stk_from, stk_other, stk_to);
-////			MoveTorus (stk_from, stk_to);
-////			AutoMoveTorus(AmoutOfDisk - 1, stk_other, stk_to, stk_from);
-////		}
-//
-//				if (AmoutOfDisk == 1) {
-//					MoveTorus (stk_from, stk_to);
-//					yield break;
-//				} 
-//					AutoMoveTorus(AmoutOfDisk - 1, stk_from, stk_other, stk_to);
-//					AutoMoveTorus(AmoutOfDisk - 1, stk_other, stk_to, stk_from);
-//					MoveTorus (stk_from, stk_to);
-//				
-//
-//		yield return new WaitForSeconds( 1 );
-//		readynow = true;
-//			
-//	}
-
-	// Update is called once per frame
-	void Update ()
-	{	
-		if (stkTowerC.Count == AmoutOfDisk) {
-			MinimumSteps = ((int)Mathf.Pow (2.0f, AmoutOfDisk)) - 1;
-			//			(MinimumSteps - (Steps - MinimumSteps))*100/MinimumSteps
-			Point = (2 * MinimumSteps - Steps) * 100 / MinimumSteps;
-			txt_message.text = "You Win !!!\nSteps " + Steps + " - Point " + Point +"\nMinimum Steps " + MinimumSteps +  "\nClick to comeback";
-			isWin = true;
-			AllButtonLockExceptReset ();
-
-			if (!isManualPlay) {
-				btn_continue.SetActive (false);
-			}
-		} else {
-			if (isPlaying) {
-				Timer += Time.deltaTime;
-			}
-		}
-
-		// Cập nhật thời gian
-		if (txt_timer != null && isPlaying) {
-			string minutes = ((int)Timer / 60).ToString();
-			string seconds = (Timer % 60).ToString("F2");
-			txt_timer.text = minutes + ":" + seconds;
-		}
-		if (!isManualPlay && readynow && isPlaying && TowerA != null && TowerB!= null && TowerC != null)  {
-			StartCoroutine (Auto(stkTowerA, stkTowerB, stkTowerC, AmoutOfDisk));
-			if (stkTowerC.Count == AmoutOfDisk) {
-				isPlaying = false;
-			}
-		}
-
-		printAll ();
-	}
-
 	void printAll(){
 		print (stkTowerA, pTowerA, defaultZ, positionY_of_level, AmoutOfDisk);
 		print (stkTowerB, pTowerB, defaultZ, positionY_of_level, AmoutOfDisk);
@@ -487,13 +416,13 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 	}
 
 	// Cần fix button
-	public IEnumerator Auto(Stack<GameObject> A, Stack<GameObject> B, Stack<GameObject> C, int AmoutOfDisk)
+	public IEnumerator AutoMoveTorus(Stack<GameObject> A, Stack<GameObject> B, Stack<GameObject> C, int AmoutOfDisk)
 	{
-		readynow = false;
+		readyNow = false;
 		if (A != null && B != null && C != null) {
 			if (AmoutOfDisk % 2 == 0)
 			{
-				while (true)
+				while (isPlaying)
 				{
 					if (C.Count != AmoutOfDisk)
 					{
@@ -584,7 +513,7 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 			}
 			else
 			{
-				while (true)
+				while (isPlaying)
 				{
 					if (C.Count != AmoutOfDisk)
 					{
@@ -673,6 +602,43 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 				}
 			}
 		}
-		readynow = true;
+		readyNow = true;
+	}
+
+	// Update is called once per frame
+	void Update ()
+	{	
+		if (stkTowerC.Count == AmoutOfDisk) {
+			MinimumSteps = ((int)Mathf.Pow (2.0f, AmoutOfDisk)) - 1;
+			//			(MinimumSteps - (Steps - MinimumSteps))*100/MinimumSteps
+			Point = (2 * MinimumSteps - Steps) * 100 / MinimumSteps;
+			txt_message.text = "You Win !!!\nSteps " + Steps + " - Point " + Point +"\nMinimum Steps " + MinimumSteps +  "\nClick to comeback";
+			isWin = true;
+			AllButtonLockExceptReset ();
+
+			if (!isManualPlay) {
+				btn_continue.SetActive (false);
+			}
+		} else {
+			if (isPlaying) {
+				Timer += Time.deltaTime;
+			}
+		}
+
+		// Cập nhật thời gian
+		if (txt_timer != null && isPlaying) {
+			string minutes = ((int)Timer / 60).ToString();
+			string seconds = (Timer % 60).ToString("F2");
+			txt_timer.text = minutes + ":" + seconds;
+		}
+
+		if (!isManualPlay && readyNow && isPlaying)  {
+			StartCoroutine (AutoMoveTorus(stkTowerA, stkTowerB, stkTowerC, AmoutOfDisk));
+			if (stkTowerC.Count == AmoutOfDisk) {
+				isPlaying = false;
+			}
+		}
+
+		printAll ();
 	}
 }
