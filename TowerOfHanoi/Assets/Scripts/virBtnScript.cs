@@ -486,6 +486,7 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 		print (stkTowerC, pTowerC, defaultZ, positionY_of_level, AmoutOfDisk);
 	}
 
+	// Cần fix button
 	public IEnumerator Auto(Stack<GameObject> A, Stack<GameObject> B, Stack<GameObject> C, int AmoutOfDisk)
 	{
 		readynow = false;
