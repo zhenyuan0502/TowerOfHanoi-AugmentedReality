@@ -7,6 +7,7 @@ public class PlayBackgroundAudio : MonoBehaviour {
 	public AudioSource audioSource;
 	// Use this for initialization
 	void Start () {
+		DontDestroyOnLoad(audioSource);
 		audioSource = GameObject.FindObjectOfType<AudioSource> ();
 		audioSource.volume = AudioManager.soundMusic;
 		audioSource.playOnAwake = true;
@@ -17,4 +18,5 @@ public class PlayBackgroundAudio : MonoBehaviour {
 	void Update(){
 		audioSource.volume = AudioManager.soundMusic;
 	}
+
 }
