@@ -380,8 +380,6 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 			txt_message.text = "Amout of Disk: " + AmoutOfDisk;
 		}
 
-
-
 	}
 
 	public void MoveTorus(Stack<GameObject> stk_from, Stack<GameObject> stk_to){
