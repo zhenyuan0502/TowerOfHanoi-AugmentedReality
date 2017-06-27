@@ -5,12 +5,12 @@ using UnityEngine.SceneManagement;
 
 public class GameLevelButton : MonoBehaviour {
 	
-	public int levelNr = 0;
+	public int level = 0;
 	public bool isManualPlay = false;
 
 	public void StartLevel()
 	{
-		GameLevel.currentLevel = levelNr;
+		GameLevel.currentLevel = level;
 		GameLevel.isManualPlay = isManualPlay;
 		SceneManager.LoadScene ("GamePlay");
 	}

@@ -5,12 +5,17 @@ using UnityEngine.UI;
 
 public class SettingsAudio : MonoBehaviour {
 	
-	public void MasterVolumne_SliderChanged(float SliderValue)
+	public void MasterVolume_SliderChanged(float SliderValue)
 	{
 		AudioListener.volume = SliderValue;
 	}
 
-	public void MusicVolumne_SliderChanged(float SliderValue)
+	public void MusicVolume_SliderChanged(float SliderValue)
+	{
+		AudioManager.soundMusic = SliderValue;
+
+	}
+	public void SFXVolume_SliderChanged(float SliderValue)
 	{
 		AudioManager.soundSFX = SliderValue;
 

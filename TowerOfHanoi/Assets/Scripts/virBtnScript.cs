@@ -52,7 +52,7 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 	private const int FLAG_TOWER_B = 2;
 	private const int FLAG_TOWER_C = 3;
 
-	int AmoutOfDisk = 0;
+	int AmoutOfDisk = 1;
 	bool isManualPlay = false;
 
 	int Steps = 0;
