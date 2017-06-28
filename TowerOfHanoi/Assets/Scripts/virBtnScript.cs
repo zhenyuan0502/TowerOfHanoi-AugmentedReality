@@ -60,6 +60,14 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 	int MinimumSteps = 0;
 	float Timer = 0.0f;
 
+	bool FirstTimeWin = false;
+
+	private AudioSource PerfectAudio;
+	private AudioSource GreatAudio;
+	private AudioSource BadAudio;
+	private AudioSource WinAudio;
+	private AudioSource VirtualButtonAudio;
+
 	// Use this for initialization
 	void Start ()
 	{
@@ -69,12 +77,27 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 		InitStacks();
 		InitFirstState ();
 		InitListeners ();
+		InitAudio ();
 
 		if (isManualPlay) {
 			ButtonManualMode ();
 		} else {
 			ButtonAutoMode ();
 		}
+	}
+
+	void InitAudio() {
+		PerfectAudio = GameObject.Find("PerfectAudio").GetComponent<AudioSource>();
+		GreatAudio = GameObject.Find("GreatAudio").GetComponent<AudioSource>();
+		BadAudio = GameObject.Find("BadAudio").GetComponent<AudioSource>();
+		WinAudio = GameObject.Find("WinAudio").GetComponent<AudioSource>();
+		VirtualButtonAudio = GameObject.Find("VirtualButtonAudio").GetComponent<AudioSource>();
+
+		PerfectAudio.volume = AudioManager.soundSFX;
+		GreatAudio.volume = AudioManager.soundSFX;
+		BadAudio.volume = AudioManager.soundSFX;
+		WinAudio.volume = AudioManager.soundSFX;
+		VirtualButtonAudio.volume = AudioManager.soundSFX;
 	}
 
 	// Khi button được nhấn, chỉ thay đổi X và Y, không thay đổi Z
@@ -100,6 +123,7 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 						isHolding = false;
 						AllButtonReleaseExceptReset ();
 					} else {
+						VirtualButtonAudio.PlayOneShot (VirtualButtonAudio.clip);
 						flag = FLAG_TOWER_A;
 						isHolding = true;
 						OneButtonClose (BUTTON_A);
@@ -124,6 +148,8 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 						AllButtonReleaseExceptReset ();
 
 					} else {
+						VirtualButtonAudio.PlayOneShot (VirtualButtonAudio.clip);
+
 						flag = FLAG_TOWER_B;
 						isHolding = true;
 						OneButtonClose (BUTTON_B);
@@ -147,6 +173,8 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 						AllButtonReleaseExceptReset ();
 
 					} else {
+						VirtualButtonAudio.PlayOneShot (VirtualButtonAudio.clip);
+
 						flag = FLAG_TOWER_C;
 						isHolding = true;
 						OneButtonClose (BUTTON_C);
@@ -157,6 +185,8 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 
 			case "btn_reset":
 				if (isWin) {
+					VirtualButtonAudio.PlayOneShot (VirtualButtonAudio.clip);
+
 					Debug.Log ("On Reset Press");
 					SceneManager.LoadScene ("Menu 3D");
 				}
@@ -170,10 +200,14 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 					// bắt đầu tự động chạy game
 					isPlaying = true;
 					readyNow = true;
+					VirtualButtonAudio.PlayOneShot (VirtualButtonAudio.clip);
+
 					btn_continue.SetActive (false);
 				}
 				break;
 			case "btn_reset":
+				VirtualButtonAudio.PlayOneShot (VirtualButtonAudio.clip);
+
 				Debug.Log ("On Reset Press");
 				SceneManager.LoadScene ("Menu 3D");
 				break;
@@ -389,6 +423,7 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 				stk_from.Pop ();
 				stk_to.Push (temp_1);
 				Steps++;
+				GreatAudio.PlayOneShot (GreatAudio.clip);
 				txt_message.text = "Good !!\nSteps:" + Steps;
 			} else {
 				GameObject temp_2 = stk_to.Peek ();
@@ -396,13 +431,16 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 					stk_from.Pop ();
 					stk_to.Push (temp_1);
 					Steps++;
+					PerfectAudio.PlayOneShot (PerfectAudio.clip);
 					txt_message.text = "Excellent !!\nSteps:" + Steps;
 				} else {
+					BadAudio.PlayOneShot (BadAudio.clip);
 					txt_message.text = "Invalid !!";
 				}
 			}
 
 		} else {
+			BadAudio.PlayOneShot (BadAudio.clip);
 			txt_message.text = "Can't move !!";
 		}
 	}
@@ -610,6 +648,12 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 			MinimumSteps = ((int)Mathf.Pow (2.0f, AmoutOfDisk)) - 1;
 			//			(MinimumSteps - (Steps - MinimumSteps))*100/MinimumSteps
 			Point = (2 * MinimumSteps - Steps) * 100 / MinimumSteps;
+
+			if (!FirstTimeWin) {
+				WinAudio.PlayOneShot (WinAudio.clip);
+				FirstTimeWin = true;
+			}
+
 			txt_message.text = "You Win !!!\nSteps " + Steps + " - Point " + Point +"\nMinimum Steps " + MinimumSteps +  "\nClick to comeback";
 			isWin = true;
 			AllButtonLockExceptReset ();

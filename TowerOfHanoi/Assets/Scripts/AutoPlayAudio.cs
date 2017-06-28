@@ -4,18 +4,11 @@ using UnityEngine;
 
 public class AutoPlayAudio : MonoBehaviour {
 
+	// Âm thanh khi nhấn nút
 	public AudioSource audioSource;
-	public AudioClip audioClip;
-	// Use this for initialization
 
-	public AutoPlayAudio(){
-		audioSource = GameObject.FindObjectOfType<AudioSource> ();
+	public void PlayButtonAudio(){
 		audioSource.volume = AudioManager.soundSFX;
-		//		audioSource.PlayOneShot (audioSource.clip);
-	}
-
-	public void PlayAudio(){
 		audioSource.PlayOneShot (audioSource.clip);
-
 	}
 }
