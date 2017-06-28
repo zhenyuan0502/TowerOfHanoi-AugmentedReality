@@ -4,6 +4,7 @@ using UnityEngine;
 using Vuforia;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using System;
 
 public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 {
@@ -45,8 +46,11 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 	bool isHolding = false;
 	bool readyNow = false;
 	bool isPlaying = false;
+	bool isTorusMoving = false;
 
 	int flag = 1;
+
+	int PositionOfTorusIsBeingMoved = 0;
 
 	private const int FLAG_TOWER_A = 1;
 	private const int FLAG_TOWER_B = 2;
@@ -67,6 +71,9 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 	private AudioSource BadAudio;
 	private AudioSource WinAudio;
 	private AudioSource VirtualButtonAudio;
+
+	private Vector3 TempPosition_From;
+	private Vector3 TempPosition_To;
 
 	// Use this for initialization
 	void Start ()
@@ -114,10 +121,10 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 						Debug.Log ("On A Press");
 						switch (flag) {
 						case FLAG_TOWER_B:
-							MoveTorus (stkTowerB, stkTowerA);
+							StartCoroutine(MoveTorus (stkTowerB, stkTowerA));
 							break;
 						case FLAG_TOWER_C:
-							MoveTorus (stkTowerC, stkTowerA);
+							StartCoroutine(MoveTorus (stkTowerC, stkTowerA));
 							break;
 						}
 						isHolding = false;
@@ -140,10 +147,10 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 
 						switch (flag) {
 						case FLAG_TOWER_A:
-							MoveTorus (stkTowerA, stkTowerB);
+							StartCoroutine(MoveTorus (stkTowerA, stkTowerB));
 							break;
 						case FLAG_TOWER_C:
-							MoveTorus (stkTowerC, stkTowerB);
+							StartCoroutine(MoveTorus (stkTowerC, stkTowerB));
 							break;
 						}
 						isHolding = false;
@@ -166,10 +173,10 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 
 						switch (flag) {
 						case FLAG_TOWER_A:
-							MoveTorus (stkTowerA, stkTowerC);
+							StartCoroutine(MoveTorus (stkTowerA, stkTowerC));
 							break;
 						case FLAG_TOWER_B:
-							MoveTorus (stkTowerB, stkTowerC);
+							StartCoroutine(MoveTorus (stkTowerB, stkTowerC));
 							break;
 						}
 						isHolding = false;
@@ -241,6 +248,7 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 	{
 		int count = stkTower.Count;
 		int element = 1;
+
 		// item lấy từ 1 -> hết stack
 		foreach (var item in stkTower) {
 			item.transform.position = new Vector3 (pTower, positionY_of_level [AmoutOfDisk - count + element], defaultZ);
@@ -419,13 +427,45 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 
 	}
 
-	public void MoveTorus(Stack<GameObject> stk_from, Stack<GameObject> stk_to){
+	public float DeterminePositionX (Stack<GameObject> stk_to){
+		if (stk_to.Equals(stkTowerA)) {
+			return pTowerA;
+		} else if (stk_to.Equals(stkTowerB)){
+			return pTowerB;
+		} else if (stk_to.Equals(stkTowerC)){
+			return pTowerC;
+		}
+		return 0;
+	}
+
+	public int DetermineWhoIsBeingMoved (Stack<GameObject> stk_from){
+		if (stk_from.Count >= 0) {
+			for (int i = 1; i <= AmoutOfDisk; i++) {
+				if (stk_from.Peek().Equals(torus[i])){
+					return i;
+				}
+			}
+		}
+		return 0;
+	}
+
+	public IEnumerator MoveTorus(Stack<GameObject> stk_from, Stack<GameObject> stk_to){
+		// Đợi cho đến khi isTorusMoving == false => khi hết di chuyển
+		if (isTorusMoving) {
+			Debug.Log ("Is Waiting end of movement");
+			yield return new WaitUntil(() => isTorusMoving == false);
+		}
+
+		isTorusMoving = true;
 		if (stk_from.Count != 0) {
 			GameObject temp_1 = stk_from.Peek ();
+			PositionOfTorusIsBeingMoved = DetermineWhoIsBeingMoved (stk_from);
+			TempPosition_From = temp_1.transform.position;
 			if (stk_to.Count == 0) {
 				stk_from.Pop ();
 				stk_to.Push (temp_1);
 				Steps++;
+				TempPosition_To = new Vector3(DeterminePositionX(stk_to), positionY_of_level[AmoutOfDisk], defaultZ);
 				GreatAudio.PlayOneShot (GreatAudio.clip);
 				txt_message.text = "Good !!\nSteps:" + Steps;
 			} else {
@@ -433,19 +473,25 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 				if (int.Parse (temp_1.name.Substring (7, 1)) < int.Parse (temp_2.name.Substring (7, 1))) {
 					stk_from.Pop ();
 					stk_to.Push (temp_1);
-					Steps++;
+					Steps++; 
+					TempPosition_To = new Vector3(temp_2.transform.position.x, int.Parse (temp_2.name.Substring (7, 1)) - 1 , temp_2.transform.position.z);
 					PerfectAudio.PlayOneShot (PerfectAudio.clip);
 					txt_message.text = "Excellent !!\nSteps:" + Steps;
 				} else {
 					BadAudio.PlayOneShot (BadAudio.clip);
+					TempPosition_To = TempPosition_From;
 					txt_message.text = "Invalid !!";
 				}
 			}
-
 		} else {
 			BadAudio.PlayOneShot (BadAudio.clip);
+			TempPosition_To = TempPosition_From;
 			txt_message.text = "Can't move !!";
 		}
+		isTorusMoving = false;
+
+		yield break;
+
 	}
 
 	void printAll(){
@@ -467,11 +513,13 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 					{
 						if (A.Count == 0)
 						{
-							yield return new WaitForSeconds( 1 ); MoveTorus (B, A);
+							yield return new WaitForSeconds( 1 ); 
+							StartCoroutine(MoveTorus (B, A));
 						}
 						else if (B.Count == 0)
 						{
-							yield return new WaitForSeconds( 1 ); MoveTorus (A, B);
+							yield return new WaitForSeconds( 1 ); 
+							StartCoroutine(MoveTorus (A, B));
 						}
 						else
 						{
@@ -481,10 +529,10 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 								var disk2 = B.Peek ();
 								if (int.Parse (disk1.name.Substring (7, 1)) < int.Parse (disk2.name.Substring (7, 1))) {
 									yield return new WaitForSeconds (1);
-									MoveTorus (A, B);
+									StartCoroutine (MoveTorus (A, B));
 								} else {
 									yield return new WaitForSeconds (1);
-									MoveTorus (B, A);
+									StartCoroutine (MoveTorus (B, A));
 								}
 							}
 						}
@@ -495,12 +543,14 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 					{
 						if (A.Count == 0)
 						{
-							yield return new WaitForSeconds( 1 ); MoveTorus (C, A);
+							yield return new WaitForSeconds( 1 ); 
+							StartCoroutine(MoveTorus (C, A));
 						}
 						else
 							if (C.Count == 0)
 							{
-								yield return new WaitForSeconds( 1 ); MoveTorus (A, C);
+								yield return new WaitForSeconds( 1 ); 
+								StartCoroutine(MoveTorus (A, C));
 							}
 							else
 							{
@@ -510,10 +560,10 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 								var disk2 = C.Peek ();
 								if (int.Parse (disk1.name.Substring (7, 1)) < int.Parse (disk2.name.Substring (7, 1))) {
 									yield return new WaitForSeconds (1);
-									MoveTorus (A, C);
+										StartCoroutine(MoveTorus (A, C));
 								} else {
 									yield return new WaitForSeconds (1);
-									MoveTorus (C, A);
+										StartCoroutine(MoveTorus (C, A));
 								}
 							}
 							}
@@ -524,12 +574,14 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 					{
 						if (B.Count == 0)
 						{
-							yield return new WaitForSeconds( 1 ); MoveTorus (C, B);
+							yield return new WaitForSeconds( 1 ); 
+							StartCoroutine(MoveTorus (C, B));
 						}
 						else
 							if (C.Count == 0)
 							{
-								yield return new WaitForSeconds( 1 ); MoveTorus (B, C);
+								yield return new WaitForSeconds( 1 ); 
+								StartCoroutine(MoveTorus (B, C));
 							}
 							else
 							{
@@ -539,10 +591,10 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 								var disk2 = C.Peek ();
 								if (int.Parse (disk1.name.Substring (7, 1)) < int.Parse (disk2.name.Substring (7, 1))) {
 									yield return new WaitForSeconds (1);
-									MoveTorus (B, C);
+										StartCoroutine(MoveTorus (B, C));
 								} else {
 									yield return new WaitForSeconds (1);
-									MoveTorus (C, B);
+										StartCoroutine(MoveTorus (C, B));
 								}
 							}
 							}
@@ -558,12 +610,14 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 					{
 						if (A.Count == 0)
 						{
-							yield return new WaitForSeconds( 1 ); MoveTorus (C, A);
+							yield return new WaitForSeconds( 1 ); 
+							StartCoroutine(MoveTorus (C, A));
 						}
 						else
 							if (C.Count == 0)
 							{
-								yield return new WaitForSeconds( 1 ); MoveTorus (A, C);
+								yield return new WaitForSeconds( 1 ); 
+								StartCoroutine(MoveTorus (A, C));
 							}
 							else
 							{	
@@ -572,11 +626,13 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 									var disk2 = C.Peek();
 									if (int.Parse (disk1.name.Substring (7, 1)) < int.Parse (disk2.name.Substring (7, 1)))
 									{
-										yield return new WaitForSeconds( 1 ); MoveTorus (A, C);
+										yield return new WaitForSeconds( 1 ); 
+										StartCoroutine(MoveTorus (A, C));
 									}
 									else
 									{
-										yield return new WaitForSeconds( 1 ); MoveTorus (C, A);
+										yield return new WaitForSeconds( 1 ); 
+										StartCoroutine(MoveTorus (C, A));
 									}
 								}
 							}
@@ -586,12 +642,12 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 					{
 						if (A.Count == 0)
 						{
-							yield return new WaitForSeconds( 1 ); MoveTorus (B, A);
+							yield return new WaitForSeconds( 1 ); StartCoroutine(MoveTorus (B, A));
 						}
 						else
 							if (B.Count == 0)
 							{
-								yield return new WaitForSeconds( 1 ); MoveTorus (A, B);
+								yield return new WaitForSeconds( 1 ); StartCoroutine(MoveTorus (A, B));
 							}
 							else
 							{
@@ -601,10 +657,10 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 									var disk2 = B.Peek ();
 									if (int.Parse (disk1.name.Substring (7, 1)) < int.Parse (disk2.name.Substring (7, 1))) {
 										yield return new WaitForSeconds (1);
-										MoveTorus (A, B);
+										StartCoroutine(MoveTorus (A, B));
 									} else {
 										yield return new WaitForSeconds (1);
-										MoveTorus (B, A);
+										StartCoroutine(MoveTorus (B, A));
 									}
 								}	
 							}
@@ -614,12 +670,12 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 					{
 						if (B.Count == 0)
 						{
-							yield return new WaitForSeconds( 1 ); MoveTorus (C, B);
+							yield return new WaitForSeconds( 1 ); StartCoroutine(MoveTorus (C, B));
 						}
 						else
 							if (C.Count == 0)
 							{
-								yield return new WaitForSeconds( 1 ); MoveTorus (B, C);
+								yield return new WaitForSeconds( 1 ); StartCoroutine(MoveTorus (B, C));
 							}
 							else
 							{
@@ -629,10 +685,10 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 								var disk2 = C.Peek ();
 								if (int.Parse (disk1.name.Substring (7, 1)) < int.Parse (disk2.name.Substring (7, 1))) {
 									yield return new WaitForSeconds (1);
-									MoveTorus (B, C);
+										StartCoroutine(MoveTorus (B, C));
 								} else {
 									yield return new WaitForSeconds (1);
-									MoveTorus (C, B);
+										StartCoroutine(MoveTorus (C, B));
 								}
 							}
 							}
@@ -684,6 +740,30 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 			}
 		}
 
-		printAll ();
+		if (!isTorusMoving && (Math.Round(TempPosition_To.x) == Math.Round(TempPosition_From.x))) {
+			printAll ();
+			TempPosition_To = TempPosition_From;
+			Debug.Log ("Print All");
+		} else {
+			printWithMovingEffect ();
+		}
+	}
+	float SpeedMoving = 4f;
+
+	void printWithMovingEffect(){
+		// Lý do còn nhảy là do chưa in những phần tử bất động ra.
+		// Còn thiếu đường đi hình vuông
+		if (torus [PositionOfTorusIsBeingMoved] != null) {
+			if (TempPosition_From.x > TempPosition_To.x) {
+				TempPosition_From.x -= SpeedMoving * Time.deltaTime;
+			} else {
+				TempPosition_From.x += SpeedMoving * Time.deltaTime;
+
+			}
+			Debug.Log ("Is Moving");
+			torus [PositionOfTorusIsBeingMoved].transform.position = TempPosition_From;
+		}
+
+		Debug.Log ("No Torus Is Being Moved");
 	}
 }
