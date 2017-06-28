@@ -3,16 +3,20 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayAudio : MonoBehaviour {
+	// Âm thanh khi nhấn nút
+	public AudioSource audioSource;
+//	// Use this for initialization
+//	void Start () {
+//		audioSource = GameObject.FindObjectOfType<AudioSource> ();
+//	}
 
-	AudioSource audioSource;
-	// Use this for initialization
-	void Start () {
-		audioSource = GameObject.FindObjectOfType<AudioSource> ();
+	public void PlayButtonAudio(){
+//		Start ();
 		audioSource.volume = AudioManager.soundSFX;
+		audioSource.PlayOneShot (audioSource.clip);
 	}
 
-	public void PlayAudioWith(AudioClip audioClip){
-		Start ();
-		audioSource.PlayOneShot (audioClip);
-	}
+//	void Update(){
+//		audioSource.volume = AudioManager.soundSFX;
+//	}
 }

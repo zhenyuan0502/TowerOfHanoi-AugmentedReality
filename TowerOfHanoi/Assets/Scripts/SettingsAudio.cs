@@ -18,6 +18,5 @@ public class SettingsAudio : MonoBehaviour {
 	public void SFXVolume_SliderChanged(float SliderValue)
 	{
 		AudioManager.soundSFX = SliderValue;
-
 	}
 }
