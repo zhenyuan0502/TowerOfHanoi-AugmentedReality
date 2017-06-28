@@ -123,10 +123,12 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 						isHolding = false;
 						AllButtonReleaseExceptReset ();
 					} else {
-						VirtualButtonAudio.PlayOneShot (VirtualButtonAudio.clip);
 						flag = FLAG_TOWER_A;
 						isHolding = true;
 						OneButtonClose (BUTTON_A);
+
+						VirtualButtonAudio.PlayOneShot (VirtualButtonAudio.clip);
+
 					}
 				}
 
@@ -148,11 +150,12 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 						AllButtonReleaseExceptReset ();
 
 					} else {
-						VirtualButtonAudio.PlayOneShot (VirtualButtonAudio.clip);
-
 						flag = FLAG_TOWER_B;
 						isHolding = true;
 						OneButtonClose (BUTTON_B);
+
+						VirtualButtonAudio.PlayOneShot (VirtualButtonAudio.clip);
+
 					}
 				}
 				break;
@@ -173,11 +176,12 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 						AllButtonReleaseExceptReset ();
 
 					} else {
-						VirtualButtonAudio.PlayOneShot (VirtualButtonAudio.clip);
-
 						flag = FLAG_TOWER_C;
 						isHolding = true;
 						OneButtonClose (BUTTON_C);
+
+						VirtualButtonAudio.PlayOneShot (VirtualButtonAudio.clip);
+
 					}
 				}
 
@@ -185,29 +189,28 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 
 			case "btn_reset":
 				if (isWin) {
-					VirtualButtonAudio.PlayOneShot (VirtualButtonAudio.clip);
-
 					Debug.Log ("On Reset Press");
 					SceneManager.LoadScene ("Menu 3D");
 				}
 				break;
 			}
+
 		} else {
 			switch (vButton.VirtualButtonName) {
 			case "btn_continue":
 				Debug.Log ("On Continue Press");
-				if (!readyNow) {
+				if (!readyNow && !isHolding) {
 					// bắt đầu tự động chạy game
 					isPlaying = true;
 					readyNow = true;
+					btn_continue.SetActive (false);
+					isHolding = true;
+
 					VirtualButtonAudio.PlayOneShot (VirtualButtonAudio.clip);
 
-					btn_continue.SetActive (false);
 				}
 				break;
 			case "btn_reset":
-				VirtualButtonAudio.PlayOneShot (VirtualButtonAudio.clip);
-
 				Debug.Log ("On Reset Press");
 				SceneManager.LoadScene ("Menu 3D");
 				break;
