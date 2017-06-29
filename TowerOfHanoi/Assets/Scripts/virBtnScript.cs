@@ -51,7 +51,7 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 	private int flag = 1;
 
 	// Vị trí của torus trong mảng
-	private  PositionOfTorusIsBeingMoved = 0;
+	private int PositionOfTorusIsBeingMoved = 0;
 
 	private const int FLAG_TOWER_A = 1;
 	private const int FLAG_TOWER_B = 2;
