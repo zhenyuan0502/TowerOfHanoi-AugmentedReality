@@ -26,15 +26,15 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 	private GameObject TowerB;
 	private GameObject TowerC;
 
-	float pTowerC = 0;
-	float pTowerB = 0;
-	float pTowerA = 0;
+	private float pTowerC = 0;
+	private float pTowerB = 0;
+	private float pTowerA = 0;
 
-	float[] positionY_of_level;
+	private float[] positionY_of_level;
 
-	Stack<GameObject> stkTowerA;
-	Stack<GameObject> stkTowerB;
-	Stack<GameObject> stkTowerC;
+	private Stack<GameObject> stkTowerA;
+	private Stack<GameObject> stkTowerB;
+	private Stack<GameObject> stkTowerC;
 
 	private GameObject[] torus;
 
@@ -42,29 +42,30 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 	public float defaultX = 0;
 	public float defaultY = 0;
 
-	bool isWin = false;
-	bool isHolding = false;
-	bool readyNow = false;
-	bool isPlaying = false;
-	bool isTorusMoving = false;
+	private bool isWin = false;
+	private bool isHolding = false;
+	private bool readyNow = false;
+	private bool isPlaying = false;
+	private bool isTorusMoving = false;
 
-	int flag = 1;
+	private int flag = 1;
 
-	int PositionOfTorusIsBeingMoved = 0;
+	// Vị trí của torus trong mảng
+	private  PositionOfTorusIsBeingMoved = 0;
 
 	private const int FLAG_TOWER_A = 1;
 	private const int FLAG_TOWER_B = 2;
 	private const int FLAG_TOWER_C = 3;
 
-	int AmoutOfDisk = 1;
-	bool isManualPlay = false;
+	private int AmoutOfDisk = 1;
+	private bool isManualPlay = false;
 
-	int Steps = 0;
-	float Point = 0;
-	int MinimumSteps = 0;
-	float Timer = 0.0f;
+	private int Steps = 0;
+	private float Point = 0;
+	private int MinimumSteps = 0;
+	private float Timer = 0.0f;
 
-	bool FirstTimeWin = false;
+	private bool FirstTimeWin = false;
 
 	private AudioSource PerfectAudio;
 	private AudioSource GreatAudio;
@@ -74,7 +75,10 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 
 	private Vector3 TempPosition_From;
 	private Vector3 TempPosition_To;
-
+	// Vị trí cao nhất mà torus muốn di chuyển
+	private float HighestY = 0;
+	// Object dùng để neo điểm Y
+	private GameObject Anchor;
 	// Use this for initialization
 	void Start ()
 	{
@@ -325,6 +329,7 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 		TowerC = GameObject.Find ("TowerC");
 		TowerB = GameObject.Find ("TowerB");
 		TowerA = GameObject.Find ("TowerA");
+		Anchor = GameObject.Find ("Anchor");
 
 		// Lấy button của Tower
 		btn_towerA = GameObject.Find ("btn_towerA");
@@ -379,6 +384,9 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 
 		// Khởi tạo vị trí tọa độ Y của torus, tọa độ Y này sẽ không thay đổi
 		positionY_of_level = new float[9];
+
+		// Lấy giá trị điểm neo Y
+		HighestY = Anchor.transform.position.y;
 	}
 
 	public void InitFirstState(){
@@ -474,7 +482,7 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 					stk_from.Pop ();
 					stk_to.Push (temp_1);
 					Steps++; 
-					TempPosition_To = new Vector3(temp_2.transform.position.x, int.Parse (temp_2.name.Substring (7, 1)) - 1 , temp_2.transform.position.z);
+					TempPosition_To = new Vector3(temp_2.transform.position.x, positionY_of_level[positionY_of_level.Length - stk_to.Count], temp_2.transform.position.z);
 					PerfectAudio.PlayOneShot (PerfectAudio.clip);
 					txt_message.text = "Excellent !!\nSteps:" + Steps;
 				} else {
@@ -740,7 +748,7 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 			}
 		}
 
-		if (!isTorusMoving && (Math.Round(TempPosition_To.x) == Math.Round(TempPosition_From.x))) {
+		if (!isTorusMoving && TempPosition_From.Equals(TempPosition_To)) {
 			printAll ();
 			TempPosition_To = TempPosition_From;
 			Debug.Log ("Print All");
@@ -748,22 +756,96 @@ public class virBtnScript : MonoBehaviour, IVirtualButtonEventHandler
 			printWithMovingEffect ();
 		}
 	}
-	float SpeedMoving = 4f;
 
+	// Tốc độ di chuyển
+	private float SpeedMoving = 10f;
+
+	// giai đoạn 1: đi lên, X giữ nguyên Y thay đổi
+	// giai đoạn 2: đi ngang, X thay đổi Y giữ nguyên
+	// giai đoạn 3: đi xuống, X giữ nguyên, Y thay đổi
+	private int StageMoving = 1;
+
+	// Ý tưởng phần này là di chuyển các torus tới gần vị trí cho phép sau đó lập tức set = vị trí đó
+	// Di chuyển qua các giai đoạn có các anchor khác nhau.
 	void printWithMovingEffect(){
 		// Lý do còn nhảy là do chưa in những phần tử bất động ra.
 		// Còn thiếu đường đi hình vuông
 		if (torus [PositionOfTorusIsBeingMoved] != null) {
-			if (TempPosition_From.x > TempPosition_To.x) {
-				TempPosition_From.x -= SpeedMoving * Time.deltaTime;
-			} else {
-				TempPosition_From.x += SpeedMoving * Time.deltaTime;
+			printAllExceptTorusIsMoving ();
 
+			if (StageMoving == 1) {
+				Debug.Log ("StageMoving = 1");
+
+				if (TempPosition_From.y > HighestY) {
+					TempPosition_From.y -= SpeedMoving * Time.deltaTime;
+				} else {
+					TempPosition_From.y += SpeedMoving * Time.deltaTime;
+				}
+
+				if (Math.Round (TempPosition_From.y) == Math.Round(HighestY)) {
+					TempPosition_From.y = HighestY;
+					StageMoving = 2;
+					return;
+				}
+			} else if (StageMoving == 2) {
+				Debug.Log ("StageMoving = 2");
+
+				if (TempPosition_From.x > TempPosition_To.x) {
+					TempPosition_From.x -= SpeedMoving * Time.deltaTime;
+				} else {
+					TempPosition_From.x += SpeedMoving * Time.deltaTime;
+				}
+
+				if (Math.Round (TempPosition_To.x) == Math.Round (TempPosition_From.x)) {
+					TempPosition_From.x = TempPosition_To.x;
+
+					StageMoving = 3;
+					return;
+				}
+			} else if (StageMoving == 3) {
+				Debug.Log ("StageMoving = 3");
+
+				if (TempPosition_From.y > TempPosition_To.y) {
+					TempPosition_From.y -= SpeedMoving * Time.deltaTime;
+				} else {
+					TempPosition_From.y += SpeedMoving * Time.deltaTime;
+				}
+
+				if (Math.Round (TempPosition_To.y) == Math.Round (TempPosition_From.y)) {
+					TempPosition_From = TempPosition_To;
+
+					StageMoving = 1;
+					return;
+
+				}
 			}
+
 			Debug.Log ("Is Moving");
 			torus [PositionOfTorusIsBeingMoved].transform.position = TempPosition_From;
+
 		}
 
 		Debug.Log ("No Torus Is Being Moved");
+	}
+
+	public void printExceptTorusIsMoving (Stack<GameObject> stkTower, float pTower, float defaultZ, float[] positionY_of_level, int AmoutOfDisk)
+	{
+		int count = stkTower.Count;
+		int element = 1;
+
+		// item lấy từ 1 -> hết stack ngoại trừ item đang chạy
+		foreach (var item in stkTower) {
+			if (!item.Equals (torus [PositionOfTorusIsBeingMoved])) {
+				item.transform.position = new Vector3 (pTower, positionY_of_level [AmoutOfDisk - count + element], defaultZ);
+			}
+			element++;
+		}
+	}
+
+	// In hết tất cả các torus ngoại trừ torus đang chạy
+	void printAllExceptTorusIsMoving(){
+		printExceptTorusIsMoving (stkTowerA, pTowerA, defaultZ, positionY_of_level, AmoutOfDisk);
+		printExceptTorusIsMoving (stkTowerB, pTowerB, defaultZ, positionY_of_level, AmoutOfDisk);
+		printExceptTorusIsMoving (stkTowerC, pTowerC, defaultZ, positionY_of_level, AmoutOfDisk);
 	}
 }
