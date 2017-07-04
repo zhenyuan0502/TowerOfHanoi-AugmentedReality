@@ -171,6 +171,10 @@ Prefab:
       propertyPath: m_Name
       value: Torus (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 2300000, guid: ac7fff3ec1f08a84f9b947b9c9ad51b1, type: 2}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 6d97e994480a3403e871cb3f805a54b7, type: 2}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: ac7fff3ec1f08a84f9b947b9c9ad51b1, type: 2}
   m_IsPrefabParent: 0
@@ -282,6 +286,10 @@ Prefab:
       propertyPath: m_Name
       value: Torus (6)
       objectReference: {fileID: 0}
+    - target: {fileID: 2300000, guid: ac7fff3ec1f08a84f9b947b9c9ad51b1, type: 2}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: d3e2a9c42301d45f2a64655497f32390, type: 2}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: ac7fff3ec1f08a84f9b947b9c9ad51b1, type: 2}
   m_IsPrefabParent: 0
@@ -960,7 +968,7 @@ MeshRenderer:
   m_LightProbeUsage: 0
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 2100000, guid: 4495ae94e028af9479112aef15b525e1, type: 2}
+  - {fileID: 2100000, guid: 0254cd511ade7484bb5561c13b2d665a, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1130,6 +1138,10 @@ Prefab:
       propertyPath: m_Name
       value: Torus (4)
       objectReference: {fileID: 0}
+    - target: {fileID: 2300000, guid: ac7fff3ec1f08a84f9b947b9c9ad51b1, type: 2}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 9351a37c70d7147fcbfdbf56ead104a3, type: 2}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: ac7fff3ec1f08a84f9b947b9c9ad51b1, type: 2}
   m_IsPrefabParent: 0
@@ -1245,6 +1257,10 @@ Prefab:
       propertyPath: m_Name
       value: Torus (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 2300000, guid: ac7fff3ec1f08a84f9b947b9c9ad51b1, type: 2}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 6dd2864d39e7a47708d2b431900c10d6, type: 2}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: ac7fff3ec1f08a84f9b947b9c9ad51b1, type: 2}
   m_IsPrefabParent: 0
@@ -1356,6 +1372,10 @@ Prefab:
       propertyPath: m_Name
       value: Torus (8)
       objectReference: {fileID: 0}
+    - target: {fileID: 2300000, guid: ac7fff3ec1f08a84f9b947b9c9ad51b1, type: 2}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: f45ec6c0c3b554a9789479b98215e63f, type: 2}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: ac7fff3ec1f08a84f9b947b9c9ad51b1, type: 2}
   m_IsPrefabParent: 0
@@ -2216,6 +2236,10 @@ Prefab:
       propertyPath: m_Name
       value: Torus (7)
       objectReference: {fileID: 0}
+    - target: {fileID: 2300000, guid: ac7fff3ec1f08a84f9b947b9c9ad51b1, type: 2}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 5aae52cc808fe4434aa9186ee61838ca, type: 2}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: ac7fff3ec1f08a84f9b947b9c9ad51b1, type: 2}
   m_IsPrefabParent: 0
